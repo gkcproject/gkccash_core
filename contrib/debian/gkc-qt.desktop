@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Gkc
+Comment=Gkc P2P Cryptocurrency
+Comment[fr]=Gkc, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Gkc, eşten eşe kriptografik sanal para birimi
+Exec=gkc-qt %u
+Terminal=false
+Type=Application
+Icon=gkc128
+MimeType=x-scheme-handler/gkc;
+Categories=Office;Finance;

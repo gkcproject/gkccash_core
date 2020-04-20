@@ -1,0 +1,30 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/gkc_bg.qm</file>
+        <file alias="ca">locale/gkc_ca.qm</file>
+        <file alias="cs">locale/gkc_cs.qm</file>
+        <file alias="da">locale/gkc_da.qm</file>
+        <file alias="de">locale/gkc_de.qm</file>
+        <file alias="en">locale/gkc_en.qm</file>
+        <file alias="en_US">locale/gkc_en_US.qm</file>
+        <file alias="es">locale/gkc_es.qm</file>
+        <file alias="fi">locale/gkc_fi.qm</file>
+        <file alias="fr_FR">locale/gkc_fr_FR.qm</file>
+        <file alias="hr">locale/gkc_hr.qm</file>
+        <file alias="it">locale/gkc_it.qm</file>
+        <file alias="ja">locale/gkc_ja.qm</file>
+        <file alias="ko_KR">locale/gkc_ko_KR.qm</file>
+        <file alias="nl">locale/gkc_nl.qm</file>
+        <file alias="pl">locale/gkc_pl.qm</file>
+        <file alias="pt">locale/gkc_pt.qm</file>
+        <file alias="pt_BR">locale/gkc_pt_BR.qm</file>
+        <file alias="ro_RO">locale/gkc_ro_RO.qm</file>
+        <file alias="ru">locale/gkc_ru.qm</file>
+        <file alias="sk">locale/gkc_sk.qm</file>
+        <file alias="sv">locale/gkc_sv.qm</file>
+        <file alias="tr">locale/gkc_tr.qm</file>
+        <file alias="uk">locale/gkc_uk.qm</file>
+        <file alias="zh_CN">locale/gkc_zh_CN.qm</file>
+        <file alias="zh_TW">locale/gkc_zh_TW.qm</file>
+    </qresource>
+</RCC>

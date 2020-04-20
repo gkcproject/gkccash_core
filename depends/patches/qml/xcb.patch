@@ -1,0 +1,9 @@
+--- old/qtx11extras/src/x11extras/x11extras.pro
++++ new/qtx11extras/src/x11extras/x11extras.pro
+@@ -8,5 +8,5 @@
+ 
+ HEADERS += qx11info_x11.h
+ SOURCES += qx11info_x11.cpp
+-
++QMAKE_USE_PRIVATE += xcb/nolink	
+ load(qt_module)

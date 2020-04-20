@@ -1,0 +1,110 @@
+diff -aurN old/include/evmc/instructions.h new/include/evmc/instructions.h
+--- old/include/evmc/instructions.h	2018-10-25 05:20:07.000000000 +0800
++++ new/include/evmc/instructions.h	2019-06-03 09:16:16.838620346 +0800
+@@ -54,6 +54,7 @@
+     OP_SAR = 0x1d,
+ 
+     OP_SHA3 = 0x20,
++    OP_TESRAINFO = 0x21,
+ 
+     OP_ADDRESS = 0x30,
+     OP_BALANCE = 0x31,
+diff -aurN old/lib/instructions/instruction_metrics.c new/lib/instructions/instruction_metrics.c
+--- old/lib/instructions/instruction_metrics.c	2018-10-25 05:20:07.000000000 +0800
++++ new/lib/instructions/instruction_metrics.c	2019-06-03 09:16:16.838620346 +0800
+@@ -55,7 +55,7 @@
+     /*                = 0x1e */ {UNDEFINED, 0, 0},
+     /*                = 0x1f */ {UNDEFINED, 0, 0},
+     /*           SHA3 = 0x20 */ {30, 2, 1},
+-    /*                = 0x21 */ {UNDEFINED, 0, 0},
++    /*       TESRAINFO = 0x21 */ {20, 4, 1},
+     /*                = 0x22 */ {UNDEFINED, 0, 0},
+     /*                = 0x23 */ {UNDEFINED, 0, 0},
+     /*                = 0x24 */ {UNDEFINED, 0, 0},
+@@ -314,7 +314,7 @@
+     /*                = 0x1e */ {UNDEFINED, 0, 0},
+     /*                = 0x1f */ {UNDEFINED, 0, 0},
+     /*           SHA3 = 0x20 */ {30, 2, 1},
+-    /*                = 0x21 */ {UNDEFINED, 0, 0},
++    /*       TESRAINFO = 0x21 */ {20, 4, 1},
+     /*                = 0x22 */ {UNDEFINED, 0, 0},
+     /*                = 0x23 */ {UNDEFINED, 0, 0},
+     /*                = 0x24 */ {UNDEFINED, 0, 0},
+@@ -573,7 +573,7 @@
+     /*                = 0x1e */ {UNDEFINED, 0, 0},
+     /*                = 0x1f */ {UNDEFINED, 0, 0},
+     /*           SHA3 = 0x20 */ {30, 2, 1},
+-    /*                = 0x21 */ {UNDEFINED, 0, 0},
++    /*       TESRAINFO = 0x21 */ {20, 4, 1},
+     /*                = 0x22 */ {UNDEFINED, 0, 0},
+     /*                = 0x23 */ {UNDEFINED, 0, 0},
+     /*                = 0x24 */ {UNDEFINED, 0, 0},
+@@ -832,7 +832,7 @@
+     /*                = 0x1e */ {UNDEFINED, 0, 0},
+     /*                = 0x1f */ {UNDEFINED, 0, 0},
+     /*           SHA3 = 0x20 */ {30, 2, 1},
+-    /*                = 0x21 */ {UNDEFINED, 0, 0},
++    /*       TESRAINFO = 0x21 */ {20, 4, 1},
+     /*                = 0x22 */ {UNDEFINED, 0, 0},
+     /*                = 0x23 */ {UNDEFINED, 0, 0},
+     /*                = 0x24 */ {UNDEFINED, 0, 0},
+@@ -1091,7 +1091,7 @@
+     /*                = 0x1e */ {UNDEFINED, 0, 0},
+     /*                = 0x1f */ {UNDEFINED, 0, 0},
+     /*           SHA3 = 0x20 */ {30, 2, 1},
+-    /*                = 0x21 */ {UNDEFINED, 0, 0},
++    /*       TESRAINFO = 0x21 */ {20, 4, 1},
+     /*                = 0x22 */ {UNDEFINED, 0, 0},
+     /*                = 0x23 */ {UNDEFINED, 0, 0},
+     /*                = 0x24 */ {UNDEFINED, 0, 0},
+diff -aurN old/lib/instructions/instruction_names.c new/lib/instructions/instruction_names.c
+--- old/lib/instructions/instruction_names.c	2018-10-25 05:20:07.000000000 +0800
++++ new/lib/instructions/instruction_names.c	2019-06-03 09:16:16.838620346 +0800
+@@ -39,7 +39,7 @@
+     /* 0x1e */ NULL,
+     /* 0x1f */ NULL,
+     /* 0x20 */ "SHA3",
+-    /* 0x21 */ NULL,
++    /* 0x21 */ "TESRAINFO",
+     /* 0x22 */ NULL,
+     /* 0x23 */ NULL,
+     /* 0x24 */ NULL,
+@@ -298,7 +298,7 @@
+     /* 0x1e */ NULL,
+     /* 0x1f */ NULL,
+     /* 0x20 */ "SHA3",
+-    /* 0x21 */ NULL,
++    /* 0x21 */ "TESRAINFO",
+     /* 0x22 */ NULL,
+     /* 0x23 */ NULL,
+     /* 0x24 */ NULL,
+@@ -557,7 +557,7 @@
+     /* 0x1e */ NULL,
+     /* 0x1f */ NULL,
+     /* 0x20 */ "SHA3",
+-    /* 0x21 */ NULL,
++    /* 0x21 */ "TESRAINFO",
+     /* 0x22 */ NULL,
+     /* 0x23 */ NULL,
+     /* 0x24 */ NULL,
+@@ -816,7 +816,7 @@
+     /* 0x1e */ NULL,
+     /* 0x1f */ NULL,
+     /* 0x20 */ "SHA3",
+-    /* 0x21 */ NULL,
++    /* 0x21 */ "TESRAINFO",
+     /* 0x22 */ NULL,
+     /* 0x23 */ NULL,
+     /* 0x24 */ NULL,
+diff -aurN old/lib/loader/loader.c new/lib/loader/loader.c
+--- old/lib/loader/loader.c	2018-10-25 05:20:07.000000000 +0800
++++ new/lib/loader/loader.c	2019-06-03 09:16:36.027350621 +0800
+@@ -12,7 +12,7 @@
+ #include <string.h>
+ 
+ #if _WIN32
+-#include <Windows.h>
++#include <windows.h>
+ #define DLL_HANDLE HMODULE
+ #define DLL_OPEN(filename) LoadLibrary(filename)
+ #define DLL_CLOSE(handle) FreeLibrary(handle)

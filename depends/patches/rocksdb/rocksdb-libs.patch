@@ -1,0 +1,12 @@
+diff -aurN old/CMakeLists.txt new/CMakeLists.txt
+--- old/CMakeLists.txt	2019-02-12 06:02:52.000000000 +0800
++++ new/CMakeLists.txt	2019-05-31 17:36:49.463677955 +0800
+@@ -737,7 +737,7 @@
+ endif()
+ 
+ if(WIN32)
+-  set(SYSTEM_LIBS ${SYSTEM_LIBS} Shlwapi.lib Rpcrt4.lib)
++  set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
+   set(LIBS ${ROCKSDB_STATIC_LIB} ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
+ else()
+   set(SYSTEM_LIBS ${CMAKE_THREAD_LIBS_INIT})

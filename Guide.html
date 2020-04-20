@@ -1,0 +1,42 @@
+<h1>GKC使用說明</h1>
+
+<ul>
+	<h2>v2.3.5</h2>
+
+	<h3>1 自動備份錢包</h3>
+	<p>程式預設每天備份一次錢包檔，備份檔案目錄為 gkc/backups/。</p>
+	<p>每次程式啟動時備份一次。程式啟動後，每隔24小時新增一個備份檔案。可修改設定檔，設置定期備份時間間隔以及備份檔案數上限。</p>
+	<p>gkc.conf檔中添加以下配置項後重啟程式生效:</p>
+	<p><1> createwalletbackups設置備份檔案數上限。當備份檔案數達到上限時，將刪除最老的備份檔案，以保存最新的備份</p>
+	<p>createwalletbackups=100000000</p>
+	<p><2> backupwalletinterval設置定期備份時間間隔。單位：分鐘</p>
+	<p>backupwalletinterval=1440</p>
+	<p>注：以上配置項是預設值，和不添加配置項的效果相同。根據需要修改參數。</p>
+
+	<h3>2 委託命令添加可選參數指定最小INPUT面值</h3>
+	<p><1> 常規用法依然有效</p>
+	<p><2> 指定INPUT的最小面值</p>
+	<p>以下例子，將選擇面值大於或等於10GKC的UTXO作為INPUT，示例</p>
+	<p>gkc-cli entrust ac4bc2a311f4e49256ae1270e2b561995f509eb22b1e3f409d18840cda4469e1 100 10</p>
+	
+	<h3>3 廣告功能</h3>
+	<p>新增3個RPC用於發送廣告和系統消息。所有使用者錢包均可發送廣告消息，僅管理員錢包可以發送系統消息。管理員錢包為共識的一部分，不可修改。</p>
+	<p><1> 發送廣告 sendadvertise</p>
+	<p>廣告費初始為每條 1 GKC，每12個月減半</p>
+	<p>使用示例 ./gkc-cli sendadvertise "Title" "Author" "Text" "Optional link" "Optional extend data"</p>
+	<p><2> 發送系統消息 sendsysmessage</p>
+	<p>使用示例 ./gkc-cli sendsysmessage "System message"</p>
+	<p><3> 過濾廣告 filteradtx</p>
+	<p>使用示例 ./gkc-cli filteradtx dbd3e44b93353c88cff5069f167783ab0de4201c9f7c7653a4745a649a3c128e</p>
+	<p>說明：參數為需要過濾的廣告交易ID</p>
+
+	<h2>v2.3.0</h2>
+	<h3>1 配置新塊收益位址</h3>
+	<p>在gkc.conf檔中添加以下配置項，重啟礦工節點後挖出的新塊收益將發到該地址上。</p>
+	<p>blockaddress=GYjzuV3DCbvPqf232YhPRUKq7ZywqVTkpq</p>
+	<p>注：該位址是示例位址，請修改為實際需要的收益位址。</p>
+	<h3>2 賽季獎勵修改</h3>
+	<p>修改後，賽季獎勵將按賽季獎勵因數進行分配。</p>
+	<p>賽季獎勵因數計算方式：累計當前賽季所有高度的有效委託量。</p>
+</ul>
+

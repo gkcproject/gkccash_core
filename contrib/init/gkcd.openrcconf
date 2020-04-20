@@ -1,0 +1,26 @@
+# /etc/conf.d/gkcd: config file for /etc/init.d/gkcd
+
+# Config file location
+#BITCOIND_CONFIGFILE="/etc/gkc/gkc.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
+#BITCOIND_PIDDIR="/var/run/gkcd"
+
+# What filename to give the pidfile
+#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/gkcd.pid"
+
+# Where to write gkcd data (be mindful that the blockchain is large)
+#BITCOIND_DATADIR="/var/lib/gkcd"
+
+# User and group to own gkcd process
+#BITCOIND_USER="gkc"
+#BITCOIND_GROUP="gkc"
+
+# Path to gkcd executable
+#BITCOIND_BIN="/usr/bin/gkcd"
+
+# Nice value to run gkcd under
+#BITCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BITCOIND_OPTS=""

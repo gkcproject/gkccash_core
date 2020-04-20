@@ -1,0 +1,26 @@
+diff -aurN old/CMakeLists.txt new/CMakeLists.txt
+--- old/CMakeLists.txt	2018-06-23 00:32:58.000000000 +0800
++++ new/CMakeLists.txt	2019-03-04 10:06:26.827381694 +0800
+@@ -32,7 +32,7 @@
+     CACHE PATH "Install dir for static libraries")
+ SET(LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}
+     CACHE PATH "Install dir for shared libraries")
+-SET(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/jsoncpp
++SET(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include
+     CACHE PATH "Install dir for headers")
+ SET(PACKAGE_INSTALL_DIR lib${LIB_SUFFIX}/cmake
+     CACHE PATH "Install dir for cmake package config files")
+diff -aurN old/src/lib_json/CMakeLists.txt new/src/lib_json/CMakeLists.txt
+--- old/src/lib_json/CMakeLists.txt	2018-06-23 00:32:58.000000000 +0800
++++ new/src/lib_json/CMakeLists.txt	2019-03-04 10:08:26.096778807 +0800
+@@ -67,8 +67,8 @@
+ 
+     INSTALL( TARGETS jsoncpp_lib_static ${INSTALL_EXPORT}
+          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR}
+-         LIBRARY DESTINATION "${LIBRARY_INSTALL_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}"
+-         ARCHIVE DESTINATION "${ARCHIVE_INSTALL_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}")
++         LIBRARY DESTINATION "${LIBRARY_INSTALL_DIR}/"
++         ARCHIVE DESTINATION "${ARCHIVE_INSTALL_DIR}/")
+ 
+     IF(NOT CMAKE_VERSION VERSION_LESS 2.8.11)
+         TARGET_INCLUDE_DIRECTORIES( jsoncpp_lib_static PUBLIC
