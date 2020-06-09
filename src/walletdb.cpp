@@ -431,6 +431,7 @@ public:
     unsigned int nKeyMeta;
     bool fIsEncrypted;
     bool fAnyUnordered;
+    bool fUpgradeHDChain;
     int nFileVersion;
     vector<uint256> vWalletUpgrade;
 
@@ -439,6 +440,7 @@ public:
         nKeys = nCKeys = nKeyMeta = 0;
         fIsEncrypted = false;
         fAnyUnordered = false;
+        fUpgradeHDChain = false;
         nFileVersion = 0;
     }
 };
@@ -739,6 +741,23 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 return false;
             }
         }
+        else if (strType == "hdchain") {
+            CHDChain chain;
+            ssValue >> chain;
+            if (!pwallet->SetHDChain(chain, true, wss.fUpgradeHDChain, false))
+            {
+                strErr = "Error reading wallet database: SetHDChain failed";
+                return false;
+            }
+        }
+        else if (strType == "mnemonic") {
+            MnemonicContainer mnContainer;
+            ssValue >> mnContainer;
+            if (!pwallet->SetMnemonicContainer(mnContainer, true)) {
+                strErr = "Error reading wallet database: SetMnemonicContainer failed";
+                return false;
+            }
+        }
     } catch (...) {
         return false;
     }
@@ -841,6 +860,10 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     if (wss.fAnyUnordered)
         result = ReorderTransactions(pwallet);
 
+    // unencrypted wallets upgrading the wallet version get a new keypool here
+    if (wss.fUpgradeHDChain && !pwallet->IsLocked())
+        pwallet->NewKeyPool();
+	
     return result;
 }
 
@@ -1105,6 +1128,16 @@ bool CWalletDB::EraseDestData(const std::string& address, const std::string& key
 {
     nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("destdata"), std::make_pair(address, key)));
+}
+
+bool CWalletDB::WriteHDChain(const CHDChain &chain) {
+    nWalletDBUpdated++;
+    return Write(std::string("hdchain"), chain);
+}
+
+bool CWalletDB::WriteMnemonic(const MnemonicContainer& mnContainer) {
+    nWalletDBUpdated++;
+    return Write(std::string("mnemonic"), mnContainer);
 }
 
 bool CWalletDB::WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend)

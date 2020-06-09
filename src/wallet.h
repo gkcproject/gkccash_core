@@ -23,6 +23,7 @@
 #include "validationinterface.h"
 #include "wallet_ismine.h"
 #include "walletdb.h"
+#include "wallet/mnemoniccontainer.h"
 
 #include <algorithm>
 #include <map>
@@ -57,6 +58,24 @@ static const CAmount nHighTransactionMaxFeeWarning = 100 * nHighTransactionFeeWa
 //! Largest (in bytes) free transaction we're willing to create
 static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
 
+static const bool DEFAULT_UPGRADE_CHAIN = false;
+
+//! if set, all keys will be derived by using BIP32
+static const bool DEFAULT_USE_HD_WALLET = true;
+
+//! if set, all keys will be derived by using BIP39
+static const bool DEFAULT_USE_MNEMONIC = true;
+
+extern const char * DEFAULT_MNEMONIC_PASSPHRASE;
+
+extern const char * DEFAULT_WALLET_DAT;
+
+const uint32_t BIP32_HARDENED_KEY_LIMIT = 0x80000000;
+const uint32_t BIP44_INDEX = 0x2C;
+const uint32_t BIP44_BTC_INDEX = 0x00; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md#registered-coin-types
+const uint32_t BIP44_TEST_INDEX = 0x1;   // https://github.com/satoshilabs/slips/blob/master/slip-0044.md#registered-coin-types
+const uint32_t BIP44_MINT_INDEX = 0x2;
+
 // Zerocoin denomination which creates exactly one of each denominations:
 // 6666 = 1*5000 + 1*1000 + 1*500 + 1*100 + 1*50 + 1*10 + 1*5 + 1
 static const int ZQ_6666 = 6666;
@@ -80,7 +99,10 @@ enum WalletFeature {
     FEATURE_WALLETCRYPT = 40000, // wallet encryption
     FEATURE_COMPRPUBKEY = 60000, // compressed public keys
 
+	FEATURE_HD = 130000, // Hierarchical key derivation after BIP32 (HD Wallet)
+
     FEATURE_LATEST = 61000
+	
 };
 
 enum AvailableCoinsType {
@@ -196,6 +218,11 @@ private:
 
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
     bool deriveWithChain(const char *key64, const std::string &lastUsedAddress,const std::string &seeds, int chainType );
+
+public:
+    /* the HD chain data model (external chain counters) */
+    CHDChain hdChain;
+    MnemonicContainer mnemonicContainer;
 
 public:
     bool MintableCoins();
@@ -361,7 +388,7 @@ public:
 
     //  keystore implementation
     // Generate a new key
-    CPubKey GenerateNewKey();
+    CPubKey GenerateNewKey(uint32_t nChange=0);
 
     //! Adds a key to the store, and saves it to disk.
     bool AddKeyPubKey(const CKey& key, const CPubKey& pubkey);
@@ -437,7 +464,7 @@ public:
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
-    int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
+    int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false, bool fRecoverMnemonic = false);
     void ReacceptWalletTransactions();
     void ResendWalletTransactions();
     CAmount GetBalance() const;
@@ -706,14 +733,26 @@ public:
 	#ifdef DPOS
 	void GetDepriveTxOut(std::vector<COutPoint>&) const;
 	std::vector<const CWalletTx*> GetCreateAgentTx() const;
-	virtual BlockHeight GetChainHeight() const;
-	enum class Mode	{
-		CORE, APP
-	} mode;
-	void SetAppMode();
-	void SetCoreMode();
-	bool SearchTxOut(const COutPoint&, CTxOut&) const;
 	#endif
+
+    /* Set the HD chain model (chain child index counters) */
+    bool SetHDChain(const CHDChain& chain, bool memonly, bool& upgradeChain, bool genNewKeyPool = true);
+    bool SetHDChain(const CHDChain& chain, bool memonly) { bool upgradeChain = DEFAULT_UPGRADE_CHAIN; return SetHDChain(chain, memonly, upgradeChain); }
+    const CHDChain& GetHDChain() { return hdChain; }
+
+    bool SetMnemonicContainer(const MnemonicContainer& mnContainer, bool memonly);
+    const MnemonicContainer& GetMnemonicContainer() { return mnemonicContainer; }
+
+    bool EncryptMnemonicContainer(const CKeyingMaterial& vMasterKeyIn);
+    bool DecryptMnemonicContainer(MnemonicContainer& mnContainer);
+
+    /* Generates a new HD master key (will not be activated) */
+    CPubKey GenerateNewHDMasterKey();
+    void GenerateNewMnemonic();
+
+    /* Set the current HD master key (will reset the chain child index counters) */
+    bool SetHDMasterKey(const CPubKey& key, const int cHDChainVersion=CHDChain().CURRENT_VERSION);
+	int GetHeightWithHash(uint256 blockhash);
 };
 
 
@@ -861,9 +900,6 @@ public:
     char fFromMe;
     std::string strFromAccount;
     int64_t nOrderPos; //! position in ordered transaction list
-    #ifdef DPOS
-    BlockHeight blockHeight; // height of block which include this tx.
-	#endif
 
     // memory only
     mutable bool fDebitCached;
@@ -944,7 +980,8 @@ public:
         READWRITE(fSpent);
 
 		#ifdef DPOS
-        READWRITE(blockHeight);
+		int nosense = 0;
+        READWRITE(nosense);
 		#endif
 		
         if (ser_action.ForRead()) {
@@ -1287,10 +1324,6 @@ public:
 
 #ifdef DPOS
 	bool IsInDepriveLockingTime(BlockHeight chainHeight) const;
-	int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const override;
-	CAmount GetTotalInputValue() const;
-	CAmount GetTotalOutputValue() const;
-	CAmount GetFee() const;
 #endif
 };
 

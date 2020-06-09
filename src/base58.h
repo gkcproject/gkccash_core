@@ -114,6 +114,7 @@ public:
     bool Set(const CTxDestination& dest);
     bool IsValid() const;
     bool IsValid(const CChainParams& params) const;
+	bool IsGKC() const;
 
     CBitcoinAddress() {}
     CBitcoinAddress(const CTxDestination& dest) { Set(dest); }

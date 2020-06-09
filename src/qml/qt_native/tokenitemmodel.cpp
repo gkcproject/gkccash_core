@@ -9,7 +9,7 @@
 #include <QDateTime>
 #include <QFont>
 #include <QThread>
-
+#include <QMessageBox>
 #include <qrencode.h>
 
 #include "imageprovider.h"
@@ -307,7 +307,7 @@ public:
         }
         else
         {
-            return 0;
+            return new TokenItemEntry();
         }
     }
 };
@@ -405,9 +405,19 @@ QVariantList TokenItemModel::updateReceiveImg(int modelIndex)
     QVariantList returnList = QVariantList();
 
     QModelIndex index_ = index(modelIndex,0);
-    QString address = index_.data(TokenItemModel::SenderRole).toString();
+
+	QString address = index_.data(TokenItemModel::SenderRole).toString();
     QString symbol = index_.data(TokenItemModel::SymbolRole).toString();
     QString address_ = "gkc:" + address;
+	
+	//int decimalDiff = decimals - m_selectedToken->decimals;
+	m_selectedToken->address = index_.data(TokenItemModel::AddressRole).toString().toStdString();
+	m_selectedToken->sender = index_.data(TokenItemModel::SenderRole).toString().toStdString();
+	m_selectedToken->symbol = symbol.toStdString();
+	m_selectedToken->decimals = index_.data(TokenItemModel::DecimalsRole).toUInt();
+	m_selectedToken->balance = index_.data(TokenItemModel::BalanceRole).toString().toStdString();
+
+	   
     QRcode* code = QRcode_encodeString(address_.toUtf8().constData(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
     if (!code) {
         return returnList;
@@ -429,15 +439,6 @@ QVariantList TokenItemModel::updateReceiveImg(int modelIndex)
 
     returnList.append(symbol);
     returnList.append(address);
-
-
-    //int decimalDiff = decimals - m_selectedToken->decimals;
-    m_selectedToken->address = index_.data(TokenItemModel::AddressRole).toString().toStdString();
-    m_selectedToken->sender = index_.data(TokenItemModel::SenderRole).toString().toStdString();
-    m_selectedToken->symbol = symbol.toStdString();
-    m_selectedToken->decimals = index_.data(TokenItemModel::DecimalsRole).toUInt();
-    m_selectedToken->balance = index_.data(TokenItemModel::BalanceRole).toString().toStdString();
-
 
     return returnList;
 }
@@ -571,16 +572,40 @@ QVariantList TokenItemModel::sendToken(const QString &payToAddress,
         return returnList;
     }
 
-    if(walletModel && walletModel->isUnspentAddress(m_selectedToken->sender))
+    if(walletModel && (walletModel->getBalance() > 0))
     {
         int unit = walletModel->getOptionsModel()->getDisplayUnit();
 
         uint64_t gasLimit = gasLimitStr.toULongLong();
         CAmount gasPrice = 0;
         BitcoinUnits::parse(gasPriceUint, gasPriceStr, &gasPrice);
+		if(gasPrice == 0)
+		{
+			returnList.append(tr("Error send token"));
+            returnList.append("Gas price cannot be 0!");
+            return returnList;
+		}
 
+		if(gasLimit == 0)
+		{
+			returnList.append(tr("Error send token"));
+            returnList.append("Gas limit cannot be 0!");
+            return returnList;
+		}
 
+		if(m_selectedToken==NULL)
+		{
+			returnList.append(tr("Error send token"));
+            returnList.append("Please select token first!");
+            return returnList;
+		}
 
+		if(m_selectedToken->address==""||m_selectedToken->balance=="")
+		{
+			returnList.append(tr("Error send token"));
+            returnList.append("Please select token first!");
+            return returnList;
+		}
 
         label = description.toStdString();
 
@@ -600,11 +625,21 @@ QVariantList TokenItemModel::sendToken(const QString &payToAddress,
 
 
         int256_t amount_;
-        BitcoinUnits::parseToken(m_selectedToken->decimals,amountStr,&amount_);
+        if(!BitcoinUnits::parseToken(m_selectedToken->decimals,amountStr,&amount_))
+        {
+			returnList.append(tr("Error send token"));
+            returnList.append("Exceeds max precision");
+            return returnList;
+		}
 
         int256_t balance;
+		
+		std::cout << "m_selectedToken->balance:" << m_selectedToken->balance << "\n";
+		std::cout << "m_selectedToken->decimals:" << m_selectedToken->decimals << "\n";
+		std::cout << "m_selectedToken->address:" << m_selectedToken->address << "\n";
+		std::cout << "m_selectedToken->sender:" << m_selectedToken->sender << "\n";
         BitcoinUnits::parseToken(m_selectedToken->decimals,QString::fromStdString(m_selectedToken->balance),&balance);
-
+		std::cout << "amount:" << amount_ << "  balance:" << balance << "\n";
 
         if(amount_ > balance)
         {
@@ -640,8 +675,8 @@ QVariantList TokenItemModel::sendToken(const QString &payToAddress,
     {
 
 
-        QString message = tr("To send %1 you need GKC on address <br /> %2.")
-                .arg(QString::fromStdString(symbol)).arg(QString::fromStdString(m_selectedToken->sender));
+        QString message = tr("To send %1 you need GKC for the fee charged.")
+                .arg(QString::fromStdString(symbol));
 
         returnList.append(tr("Error send token"));
         returnList.append(message);
@@ -649,6 +684,11 @@ QVariantList TokenItemModel::sendToken(const QString &payToAddress,
     }
 
     return returnList;
+}
+
+void TokenItemModel::clearSendToken()
+{
+	toAddress = "";
 }
 
 
@@ -660,6 +700,11 @@ bool TokenItemModel::sendTokenConfirmed()
     {
         return false;
     }
+
+	if(toAddress=="")
+	{
+		return false;
+	}
 
     QString errorMessage;
 
@@ -681,8 +726,9 @@ bool TokenItemModel::sendTokenConfirmed()
 
 
 
-    emit execError(errorMessage);
-
+    //emit execError(errorMessage);
+	QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,"Error",errorMessage,QMessageBox::Ok);	 
+	msgBox->show();
 
 
     return false;

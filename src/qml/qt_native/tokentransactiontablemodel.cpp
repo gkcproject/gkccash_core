@@ -418,7 +418,7 @@ QString TokenTransactionTableModel::formatTxToAddress(const TokenTransactionReco
         return QString::fromStdString(wtx->address);
     case TokenTransactionRecord::RecvWithAddress:
     case TokenTransactionRecord::SendToAddress:
-        return lookupAddress(wtx->address, wtx->label, tooltip);
+        //return lookupAddress(wtx->address, wtx->label, tooltip);
     case TokenTransactionRecord::SendToOther:
         return QString::fromStdString(wtx->address);
     case TokenTransactionRecord::SendToSelf:

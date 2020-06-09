@@ -14,6 +14,8 @@
         <file>images/icons/shibai.png</file>
         <file>images/icons/dialog_close.png</file>
         <file>images/icons/logo.png</file>
+        <file>images/icons/create.png</file>
+        <file>images/icons/recover.png</file>
         <file>qml/app_items/NaviPanel.qml</file>
         <file>images/navi/shouye.png</file>
         <file>images/navi/fasong.png</file>
@@ -57,6 +59,7 @@
         <file>qml/app_items/CommonTextArea.qml</file>
         <file>qml/base_items/NativeTextArea.qml</file>
         <file>images/icons/copy.png</file>
+		<file>images/icons/copy1.png</file>
         <file>qml/app_items/CommonTabView.qml</file>
         <file>qml/app_dialogs/MultiSignAddressInterDialog.qml</file>
         <file>qml/app_items/AddressItem.qml</file>
@@ -142,6 +145,13 @@
         <file>images/icons/walletUnlocked.png</file>
         <file>images/icons/leftCornerImg.png</file>
         <file>images/icons/right.png</file>
+		<file>images/icons/sendAdve.png</file>
+		<file>images/icons/author.png</file>
+		<file>images/icons/block.png</file>
+		<file>images/icons/del1.png</file>
+		<file>images/icons/guanggao.png</file>
+		<file>images/icons/hash.png</file>
+		<file>images/icons/link.png</file>
         <file>images/navi/fasongPicked.png</file>
         <file>images/navi/heyuePicked.png</file>
         <file>images/navi/jiedianPicked.png</file>
@@ -151,6 +161,18 @@
         <file>images/navi/shouyePicked.png</file>
 		<file>images/navi/entrust.png</file>
 		<file>images/navi/entrustPicked.png</file>
+		<file>images/navi/newsPicked.png</file>
+		<file>images/navi/news.png</file>
         <file>qml/app_pages/EntrustPage.qml</file>
+        <file>qml/app_items/NotificationBriefItem.qml</file>
+        <file>qml/app_items/NotificationDetailsItem.qml</file>
+        <file>qml/app_items/NotificationSendItem.qml</file>
+        <file>qml/app_pages/NotificationList.qml</file>
+        <file>qml/app_pages/NotificationPage.qml</file>
+        <file>qml/app_pages/CreateWalletPage.qml</file>
+		<file>qml/app_items/CheckWords.qml</file>
+		<file>qml/app_items/CreateWords.qml</file>
+		<file>qml/app_items/RecoverWords.qml</file>
+		<file>qml/app_items/Seedword.qml</file>		
     </qresource>
 </RCC>

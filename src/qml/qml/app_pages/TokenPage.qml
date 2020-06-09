@@ -183,6 +183,16 @@ Controls_1_4.Tab{
                 model: walletModel.tokenItemModel
                 spacing: 2
 
+                Component.onCompleted:
+			    {
+			        walletModel.addTokenEntryEmit.connect(setCurrentIndex)
+			    }
+
+			    function setCurrentIndex()
+			    {
+					currentIndex = -1
+			    }
+
                 onCurrentIndexChanged:
                 {
                     var res = walletModel.tokenItemModel.updateReceiveImg(currentIndex)
@@ -205,6 +215,7 @@ Controls_1_4.Tab{
                     onConfirmed:
                     {
                         walletModel.tokenItemModel.removeTokenItem(tokenItemsView.currentIndex)
+                        currentIndex = -1
                         warningDialog.close()
                     }
 
@@ -344,6 +355,7 @@ Controls_1_4.Tab{
                             else
                             {
                                 tokenItemsView.currentIndex = index
+                                walletModel.tokenItemModel.updateReceiveImg(index)
                             }
 
 
@@ -509,38 +521,39 @@ Controls_1_4.Tab{
                 id:symbolbox
                 width: 180
                 anchors.verticalCenter: header_label.verticalCenter
-                anchors.right: min_amount_textField.left
-                anchors.rightMargin: 3
+                anchors.right: parent.right
+                anchors.rightMargin: 10
                 //color: "#333333"
                 //text:"Use this from to request payments ALL fields are optional"
-                onCurrentIndexChanged:
+                onCurrentStringChanged:
                 {
-                    walletModel.tokenfilterproxy.chooseType(index)
+                    walletModel.tokenfilterproxy.chooseName(index)
                 }
 
                 model: walletModel.tokenfilterproxy.tokenNameList
             }
 
-            CommonTextField
-            {
-                id:min_amount_textField
-                width:160
-                font.weight: Font.Light
-                font.pixelSize:13
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-                anchors.verticalCenter: header_label.verticalCenter
-                placeholderText: qsTr("Min amount")
-                validator: DoubleValidator
-                {
-                    bottom: 0
-                    decimals: 12
-                    notation: DoubleValidator.StandardNotation
-                }
+            //CommonTextField
+            //{
+            //    id:min_amount_textField
+            //    width:160
+            //    font.weight: Font.Light
+            //    font.pixelSize:13
+            //    anchors.right: parent.right
+            //    anchors.rightMargin: 10
+            //    anchors.verticalCenter: header_label.verticalCenter
+            //    placeholderText: qsTr("Min amount")
+            //    enabled: false
+            //    validator: DoubleValidator
+            //    {
+            //        bottom: 0
+            //        decimals: 12
+            //        notation: DoubleValidator.StandardNotation
+            //    }
 
-                  onTextChanged:walletModel.tokenfilterproxy.changedAmount(text)
+            //      onTextChanged:walletModel.tokenfilterproxy.changedAmount(text)
 
-            }
+            //}
 
             DateEdit
             {
@@ -558,6 +571,11 @@ Controls_1_4.Tab{
                 {
                      if(header_label.currentIndex_ == 6)
                         walletModel.tokenfilterproxy.dateRangeChanged(fromDate.dateValue,toDate.dateValue)
+                }
+
+                onBtnDown:
+                {
+					toDate.close_calender()
                 }
 
             }
@@ -578,6 +596,11 @@ Controls_1_4.Tab{
                 {
                     if(header_label.currentIndex_ == 6)
                         walletModel.tokenfilterproxy.dateRangeChanged(fromDate.dateValue,toDate.dateValue)
+                }
+
+                onBtnDown:
+                {
+					fromDate.close_calender()
                 }
             }
 

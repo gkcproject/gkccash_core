@@ -35,6 +35,12 @@ Controls_1_4.Tab {
 	property string details_label_str: qsTr("utxo number: --      entrust number: --")
 	property bool detailsVisible:false
 
+	property int notification_index:0
+	property string notification_str:qsTr("notification title")
+	property bool notificationVisible:true
+
+	
+
     Component.onCompleted:
     {
         walletModel.balanceChanged.connect(setBalance)
@@ -95,19 +101,108 @@ Controls_1_4.Tab {
 
 
 
+
     Rectangle {
         anchors.fill:parent
 
         radius: 0
         color: "#212b50"
 
+		function init()
+		{
+			timer_1.start()
+			notificationVisible = true
+			walletModel.UpdateNotificationRecordList(0,0,20)
+		}
+
+		function colseTimer()
+		{
+			timer_1.stop()
+		}
+			
+	    Timer{
+	        id:timer_1
+	        interval: 2000
+	        repeat: true
+	        triggeredOnStart: true 
+	        onTriggered: {
+	            if(notification_index==3)
+	            {
+					notification_index = 0
+	            }
+	            notification_str = walletModel.GetNotificationTitle(notification_index)
+	            if(notification_str==="")
+	            {
+					notification_index = 0
+					notification_str = walletModel.GetNotificationTitle(notification_index)
+	            }
+				notification_index++
+	        }
+	    }
+
+	    //onDoubleClicked:
+        //{
+        //	gotoNotificationPage()
+        //}
+		
+		Rectangle{
+			id:notification_rtangle
+			radius:0
+			color:"#2A3358"
+			height:50
+			anchors.top:parent.top
+			anchors.left: parent.left		
+			anchors.right:parent.right
+			anchors.topMargin: 25
+	        anchors.leftMargin: 22
+	        anchors.rightMargin: 22
+
+	        visible:notificationVisible
+
+	        Image {
+				id:notification_icon
+				x:8
+				y:13
+				width:24
+				height:24
+				source:"../../images/icons/guanggao.png"
+	        }
+	        Label{
+	        	id:notification_label
+	            text:notification_str
+	            color: "#FFFFFF"
+	            anchors.left:notification_icon.right
+	            anchors.leftMargin: 16
+	            font.pixelSize: 16
+	            anchors.verticalCenter: parent.verticalCenter
+	            font.weight: Font.Normal
+	        }
+
+	        Image {
+				id:clear_icon
+				anchors.top:parent.top
+	            anchors.topMargin: 14
+	            anchors.right:parent.right
+	            anchors.rightMargin: 16
+				width:22
+				height:22
+				source:"../../images/icons/del1.png"
+				MouseArea{
+					anchors.fill: parent
+			        onClicked: {
+			        	colseTimer()
+						notificationVisible = false
+			        }
+				}
+	        }
+		}
 
 
         CommonSelectableLabel {
             id:balance_label
             font.weight: Font.Normal
             font.pixelSize:26
-            anchors.top:parent.top
+            anchors.top:notificationVisible?notification_rtangle.bottom:parent.top
             anchors.left: parent.left
             anchors.topMargin: 25
             anchors.leftMargin: 22
@@ -314,7 +409,7 @@ Controls_1_4.Tab {
             font.pixelSize:18
             anchors.right: parent.right
             anchors.rightMargin: 400
-            anchors.top: parent.top
+            anchors.top: notificationVisible?notification_rtangle.bottom:parent.top
             anchors.topMargin: 35
             color: walletModel.isTestNet()?"#202020":"#3285C4"
             text:qsTr("GKC Balances")

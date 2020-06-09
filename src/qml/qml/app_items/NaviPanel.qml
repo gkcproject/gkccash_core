@@ -180,6 +180,26 @@ Column{
         }
 	}
 
+	NaviItem
+	{
+		id:notification
+        icon:(picked||hovered)?"../../images/navi/newsPicked.png":"../../images/navi/news.png"
+        title: qsTr("Notification")
+        picked: false
+        index_:8
+
+        onHoveredChanged:
+        {
+            if(hovered)
+                secondaryPanel.closeMenu()
+        }
+
+        onClicked:
+        {
+            secondaryPanel.clear_others()
+        }
+	}
+
     function reset_all_items()
     {
         index.picked = false
@@ -190,6 +210,7 @@ Column{
         mainnode.picked = false
         contractNode.picked = false
 		entrust.picked = false
+		notification.picked = false
     }
 
 	function gotoMainNodePage()
@@ -218,6 +239,13 @@ Column{
 		reset_all_items()
         entrust.picked = true
         tab_change(8)
+	}
+
+	function gotoNotificationPage()
+	{
+		reset_all_items()
+        ntification.picked = true
+        tab_change(9)
 	}
 
     Connections
@@ -249,6 +277,10 @@ Column{
 			else if(index === 7)
 			{
 				gotoEntrustpage()
+			}
+			else if(index == 8)
+			{
+				gotoNotificationPage()
 			}
         }
     }

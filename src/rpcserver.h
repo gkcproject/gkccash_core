@@ -362,4 +362,6 @@ extern UniValue listad(const UniValue& params, bool fHelp);
 extern UniValue listsysmsg(const UniValue& params, bool fHelp);
 extern UniValue listadfilter(const UniValue& params, bool fHelp);
 
+extern UniValue getmnemoniccode(const UniValue& params, bool fHelp);
+
 #endif // BITCOIN_RPCSERVER_H

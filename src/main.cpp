@@ -108,6 +108,7 @@ map<uint256, COrphanTx> mapOrphanTransactions;
 map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
 map<uint256, int64_t> mapRejectedBlocks;
 
+//New block initial address
 CBitcoinAddress newBlockAddress;
 
 std::string appNodeLabelMode;
@@ -1507,6 +1508,13 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
             return state.DoS(100, error("CheckTransaction() : txout total out of range"),
                              REJECT_INVALID, "bad-txns-txouttotal-toolarge");
 
+		if(chainActive.Height() >= Params().forkheight_checkPubkeyAddress){
+			std::vector<CBitcoinAddress> addresses = txout.GetScriptAddresses();
+			if(!addresses.empty() && !addresses[0].IsGKC())
+				return state.DoS(10, error("CheckTransaction() : Invalid GKC address"),
+								 REJECT_INVALID, "bad-txns-address-invalid");
+		}
+
         /////////////////////////////////////////////////////////// // gkc-vm
         //FixMe: Make sure these judges are aright
 
@@ -1524,6 +1532,41 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
                 return state.DoS(100, error("CheckTransaction() : smart contract script not standard"),
                                  REJECT_INVALID, "bad-txns-contract-nonstandard");
             }
+
+			std::vector<valtype> stack;
+			if(whichType == TX_CALL2 && EvalScript(stack, txout.scriptPubKey, SCRIPT_EXEC_BYTE_CODE, BaseSignatureChecker(),nullptr) && stack.size() >= 8)
+			{
+				//opcodetype opcode = (opcodetype)(*stack.back().begin());
+				stack.pop_back();
+
+				valtype senderSignature = stack.back();
+				stack.pop_back();			
+
+				CPubKey senderPubKey = CPubKey(stack.back().begin(),stack.back().end());
+				stack.pop_back();
+				
+				valtype contractaddress = stack.back();
+				stack.pop_back();
+
+				valtype datahex = stack.back();
+				stack.pop_back();
+				
+				valtype nGasPrice = stack.back();
+				stack.pop_back();
+
+				valtype nGasLimit = stack.back();
+				stack.pop_back();
+
+				valtype versionVM = stack.back();
+				stack.pop_back();
+				
+				CHashWriter scriptHasWriter(SER_GETHASH, 0);
+				scriptHasWriter << contractaddress << datahex;
+				if(tx.vin.size() > 0)
+					scriptHasWriter << tx.vin[0].prevout.hash << tx.vin[0].prevout.n;					
+				if(!senderPubKey.Verify(scriptHasWriter.GetHash(), senderSignature) && chainActive.Height() > 102400) // There are erroneous transactions below 102400 in the testnet
+					return state.DoS(100, error("CheckTransaction() : sender of CALL contract tx verify failed"), REJECT_INVALID, "bad-contract-sender");
+			}
         }
         ///////////////////////////////////////////////////////////
 
@@ -2279,10 +2322,6 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex)
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().ToString().c_str(), pindex->GetBlockHash().ToString().c_str());
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*) : GetHash() doesn't match index");
     }
-	#ifdef DPOS
-	assert(pindex->nHeight != invalidBlockHeight);
-	block.height = pindex->nHeight;
-	#endif
     return true;
 }
 
@@ -6961,7 +7000,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
             BOOST_FOREACH (uint256 hash, vEraseQueue)EraseOrphanTx(hash);
         } else if (tx.IsZerocoinSpend() && AcceptToMemoryPool(mempool, state, tx, true, &fMissingZerocoinInputs, false, ignoreFees)) {
-            //Presstab: ZCoin has a bunch of code commented out here. Is this something that should have more going on?
+            //Presstab: Gkc has a bunch of code commented out here. Is this something that should have more going on?
             //Also there is nothing that handles fMissingZerocoinInputs. Does there need to be?
             RelayTransaction(tx);
             LogPrint("mempool", "AcceptToMemoryPool: Zerocoinspend peer=%d %s : accepted %s (poolsz %u)\n",
@@ -7805,6 +7844,9 @@ std::string CBlockFileInfo::ToString() const
 CAmount advertisement::GetAdPrice(BlockHeight h)
 {
 	CAmount price = 1*COIN;
+	if(h >= Params().forkheight_modifyAdPrice){
+		price = 10*COIN;
+	}
 	BlockHeight start = crp::CoinReleasePlan::GetInstance().pos.heightRange.Begin();
 	BlockHeight interval = 12*crp::CoinReleasePlan::GetInstance().pos.BlockNumPerMonth();
 	return halve(price,start,interval,h);

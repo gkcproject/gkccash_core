@@ -41,7 +41,7 @@ public:
                                        const QString &amountStr,
                                        const QString &description
                                        );
-
+	Q_INVOKABLE void clearSendToken();
     Q_INVOKABLE bool sendTokenConfirmed();
 
 

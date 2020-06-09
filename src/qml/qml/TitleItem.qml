@@ -136,7 +136,7 @@ Rectangle{
             ListElement { modelData: qsTr("Net Monitor"); }
             ListElement { modelData: qsTr("Peers Info"); }
             ListElement { modelData: qsTr("Wallet Repair"); }
-            ListElement { modelData: qsTr("Add Address"); }
+            //ListElement { modelData: qsTr("Add Address"); }
             ListElement { modelData: qsTr("Open Wallet Conf"); }
             ListElement { modelData: qsTr("Open Masternode Conf"); }
             ListElement { modelData: qsTr("Open Auto Save"); }
@@ -166,11 +166,11 @@ Rectangle{
             case 2:toolsDialog.show();toolsDialog.current_index=2;toolsDialog.raise();break;
             case 3:toolsDialog.show();toolsDialog.current_index=3;toolsDialog.raise();break;
             case 4:toolsDialog.show();toolsDialog.current_index=4;toolsDialog.raise();break;
-            case 5:toolsDialog.show();toolsDialog.current_index=5;toolsDialog.raise();break;
-            case 6:rpcConsole.showConfEditor(); break;
-            case 7:rpcConsole.showMNConfEditor();break;
-            case 8:rpcConsole.showBackups();break;
-            case 9:
+            //case 5:toolsDialog.show();toolsDialog.current_index=5;toolsDialog.raise();break;
+            case 5:rpcConsole.showConfEditor(); break;
+            case 6:rpcConsole.showMNConfEditor();break;
+            case 7:rpcConsole.showBackups();break;
+            case 8:
             {
 
                 if(fisrt_run && !blockExplorer.isTxindexSet())

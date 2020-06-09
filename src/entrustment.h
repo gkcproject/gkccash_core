@@ -54,7 +54,7 @@ class Agent
 public:
 	AgentID id;
 	std::string name;
-	CAmount receivedTotalAmount;
+	CAmount receivedTotalAmount; //The total number of all entrusts received by the node
 	std::map<CBitcoinAddress,dpos::UserStatistics> userStatistics;
 	crp::BlockAmount generatedBlockAmount;
 	int64_t lastBlockTime;
@@ -67,6 +67,7 @@ public:
 
 	CAmount GetTotalDealDivideAmount() const;
 	CAmount GetTotalDividendAmount() const;
+	int GetActiveUserCount() const;
 
 	ADD_SERIALIZE_METHODS;
 
@@ -150,7 +151,13 @@ public:
 
 	BlockHeight forkHeightForLockMinerRewardReceiver;
 	BlockHeight forkHeightForSpecifyMinerRewardReceiver;
-	BlockHeight forkHeightForHalfAmountLimit;
+	BlockHeight forkheight_halfMinEntrustAmount;
+	BlockHeight forkheight_halfCreateAgentAmount;
+	BlockHeight forkheight_halfMinDivideReward;
+
+	CAmount GetMinDivideReward(BlockHeight) const;
+	CAmount GetMinDivideRewardV1() const;
+	CAmount GetMinDivideRewardV2() const;
 
 	bool IsSeasonRewardV2(BlockHeight) const;
 
@@ -172,6 +179,7 @@ public:
 	CAmount GetCreateAgentAmount(BlockHeight blockheight) const;
 	CAmount GetMinEntrustAmount(BlockHeight blockheight) const;
 	BlockHeight GetLockHeightForDeprive() const;
+	BlockHeight GetDepriveTxLockHeight() const;
 	
 	bool CheckCoinStake(BlockHeight blockheight, const CTransaction& coinstake);
 	bool CheckTransaction(const CTransaction&) const;
@@ -204,6 +212,8 @@ public:
 	void Lock();
 	void Unlock();
 
+	bool IsActiveUser(const dpos::UserStatistics&, BlockHeight height) const;
+
 protected:
 	bool AddAgentTx(BlockHeight, CTransaction&);
 	bool DelAgentTx(BlockHeight, CTransaction&);
@@ -217,18 +227,23 @@ protected:
 	const dpos::UserStatistics* GetUserStatistics(BlockHeight, const AgentID&, const CBitcoinAddress&) const;
 	void CalcSeasonRewardFactor(BlockHeight height);
 	void CalcExpectRewardOfSeason(BlockHeight);
+	void ClearInactiveEntrustUser(BlockHeight height);
 	bool IsEntrustTxIsLocking(const uint256& txid, BlockHeight chainHeight) const;
+	bool IsDepriveTxIsLocking(const uint256& txid, BlockHeight chainHeight) const;
 
 private:
 	AgentID myAgentId;
 
-	CAmount createAgentAmount;
-	CAmount minEntrustAmount;
-	CAmount minDivideReward;
+	//config parameters
+	CAmount createAgentAmount; //Quantity needed to create AGENT
+	CAmount minEntrustAmount; //Minimum entrust quantity
+	CAmount minDivideReward; //Minimum bonus amount
+	CAmount minDivideReward_v2; //Minimum bonus amount version 2
 	BlockHeight depriveLockHeight;
+	BlockHeight depriveTxLockHeight;
 	BlockHeight baseHeightOffset;
 
-	AgentMapMap agentMaps;
+	AgentMapMap agentMaps; //At each height, all dpos-node information at the height is stored in agentMaps
 
 	
 	CCriticalSection cs_heights;
@@ -258,7 +273,7 @@ namespace dpos
 	vector<CBitcoinAddress> GetAddressesInScript(const CScript&);
 
 
-	class DposMetaBlock
+	class DposMetaBlock // Meta data for DPOS statistics
 	{
 	public:
 		class Create {
@@ -285,13 +300,13 @@ namespace dpos
 		};
 		
 		enum EntrustType { ENTRUST, DEPRIVE };
-		class Entrust {
+		class Entrust { // ENTRUST or DEPRIVE tx
 		public:
-			string             addr;
-			/*EntrustType*/int type;
- 			AgentID 		   agentid;
+			string             addr;    // user gkc address
+			/*EntrustType*/int type;    // ENTRUST or DEPRIVE
+ 			AgentID 		   agentid; // Entrust target AGENT, or source AGENT of deprive
  			CAmount 		   amount;
- 			uint256 		   txid;
+ 			uint256 		   txid;    // The transaction ID of the entrusted or deprive transaction
  			int 			   vout_i;
 	
 			ADD_SERIALIZE_METHODS;
@@ -306,7 +321,7 @@ namespace dpos
 			}
 		};
 			
-		enum class RewardType { ENTRUST, SEASON };
+		enum class RewardType { ENTRUST/*Entrusted bonus reward*/, SEASON/*Seasonal bonus*/ };
 		class Reward {
 		public:
 			string            addr;

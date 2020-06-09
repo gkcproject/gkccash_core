@@ -1,4 +1,4 @@
-<h1>GKC Release Version 2.3.6</h1>
+<h1>GKC Release Version 2.4.0</h1>
 
 <h4>You are now using release version of GKC. There are several missing functions and bugs already known. If you found any new bugs，or you have any advice, feel free to contact us. Please DO NOT discuss in public. Thanks！</h4>
 
@@ -11,10 +11,29 @@
 <h1>Change Log</h1>
 
 <ul>
-	<h5> vx.x.x </ h5>
+	<h5> v2.4.0 </h5>
+	<li>1 Fix the problem that the block browser displays inaccurate number of DPOS users</li>
+	<li>2 Fork (207282): Fix the problem of destroying the remaining small unissued coins after the entrusted user redeems and pays dividends</li>
+	<li>3 Fork (207282): Fix the initial advertising fee issue</li>
+	<li>4 Fix contract issues</li>
+	<li>5 Wallet upgraded to HD wallet, repair support 24 BIP39 mnemonic recovery wallet</li>
+	<li>6 When sending advertisements, check whether the advertisement content contains sensitive words</li>
+	<li>7 PC version disables selection of custom data directory</li>
+	<li>8 Code optimization: remove unnecessary code and comments</li>
+	<li>9 Fork (207282): Fix the problem of transfer to non-GKC addresses</li>
+	<li>10 Fork (207282): Fix the problem that the UTXO commissioned for redemption needs to be locked</li>
+	<li>11 Fork (207282): fix data overflow problem, halve the number of stakes in equity nodes</li>
+	<li>12 Fork (207282): Fix the data overflow problem and reduce the lower limit of the number of commissions</li>
+	<li>13 Fork (207282): Fix the data overflow problem and reduce the minimum number of commission dividends</li>
+	<li>14 New advertising and system notification interface</li>
+	<li>15 Added the function of creating and restoring wallets on PC interface through mnemonic words</li>
+	<li>16 Fix the problem that the inspection sent by the contract and continue to send after the inspection fails</li>
+
+	<h5> v2.3.7 </h5>
 	<li> 1 Fix DPOS transaction consensus check issue </li>
 	<li> 2 Wallet saves advertising information </li>
-	<li> 3 Consensus modification: From the height of 137105, the locked state of the entrusted transaction in the redemption transaction will be checked </li>
+	<li> 3 Consensus modification: Fix the problem that the entrusted transaction can be redeemed within the lock time, which will take effect after the height of 138467 </li>
+	<li> 4 Fix the problem that the program crashes when the PC version creates a contract </li>
 
 	<h5> v2.3.6</h5>
 	<li> 1 Fix DPOS statistical rollback issue </li>

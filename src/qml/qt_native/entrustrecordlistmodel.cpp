@@ -77,6 +77,7 @@ QVariant EntrustRecordListModel::data(const QModelIndex &index, int role)  const
 
 void EntrustRecordListModel::UpdateEntrustRecordList()
 {
+	LogPrintf("----->UpdateEntrustRecordList ");
 	clear();
     std::vector<COutPoint> vOutpts;
 	pwalletMain->ListLockedCoins(vOutpts);
@@ -99,6 +100,7 @@ void EntrustRecordListModel::UpdateEntrustRecordList()
 				totalAmount_ += txout.nValue;
 				Add(er);
 			}
+			LogPrintf("----->hash:%s ",hashBlock.GetHex());
 		}
 	}	
 }
@@ -171,6 +173,43 @@ QString EntrustRecordListModel::GetDescription(int row)
     html += "<b style=\"color:#FDA205;\"> Tips:</b>" + tips;
     return html;
 }
+
+QString EntrustRecordListModel::GetEntructDescription(int row)
+{
+    if(row<0||row>=entrustRecords.size())
+    {
+        return "";
+    }
+    EntrustRecord er = entrustRecords[row];
+    QString html = "";
+    html += "<html><font face='verdana, arial, helvetica, sans-serif'>";
+    html += "<b>" + tr("NodeID") + ":</b> " + er.AGENT();
+    html += "<br>";
+	html += "<b>" + tr("TxID") + ":</b> " + er.TXID();
+    html += "<br>";
+    html += "<b>" + tr("EntrustNumber") + ":</b> " + QString::number(er.AMOUNT(),'f',8) + "GKC";
+    html += "<br>";
+    return html;
+}
+
+QString EntrustRecordListModel::GetDepriveDescription(int row)
+{
+	if(row<0||row>=entrustRecords.size())
+	{
+		return "";
+	}
+	EntrustRecord er = entrustRecords[row];
+    QString html = "";
+    html += "<html><font face='verdana, arial, helvetica, sans-serif'>";
+    html += "<b>" + tr("NodeID") + ":</b> " + er.AGENT();
+    html += "<br>";
+	html += "<b>" + tr("TxID") + ":</b> " + er.TXID();
+    html += "<br>";
+    html += "<b>" + tr("DepriveNumber") + ":</b> " + QString::number(er.AMOUNT(),'f',8) + "GKC";
+    html += "<br>";
+    return html;
+}
+
 
 QHash<int, QByteArray> EntrustRecordListModel::roleNames() const
 {

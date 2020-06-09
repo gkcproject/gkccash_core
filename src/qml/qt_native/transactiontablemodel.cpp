@@ -75,7 +75,7 @@ public:
         {
             LOCK2(cs_main, wallet->cs_wallet);
             for (std::map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it) {
-                if (TransactionRecord::showTransaction(it->second))
+                if (TransactionRecord::showTransaction(it->second) && wallet->IsMine(it->second))
                     cachedWallet.append(TransactionRecord::decomposeTransaction(wallet, it->second));
             }
         }
@@ -396,6 +396,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Entrust");
 	case TransactionRecord::Deprive:
         return tr("Deprive");
+	case TransactionRecord::GasRefund:
+		return tr("GasRefund");
 
     default:
         return "";

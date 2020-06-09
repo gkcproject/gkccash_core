@@ -2,13 +2,16 @@
 #include <QQmlApplicationEngine>
 #include <QFont>
 #include <QQuickWindow>
+#include <QQuickView>
 #include <QQmlContext>
 #include "cursorposprovider.h"
 #include <QQuickStyle>
 #include <QTextCodec>
 #include <QFontDatabase>
-
-
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QString>
+#include <QFile>
 #include <QLibraryInfo>
 
 #include <QTranslator>
@@ -60,6 +63,51 @@ void DetectShutdownThread(boost::thread_group* threadGroup)
 //
 // Start
 //
+
+bool pickDataDirectory(int argc, char *argv[])
+{
+	namespace fs = boost::filesystem;
+    QSettings settings;
+	if (!GetArg("-datadir", "").empty())
+        return true;
+
+	QString dataDir = Intro::getDefaultDataDirectory();
+	dataDir = settings.value("strDataDir", dataDir).toString();
+	SoftSetArg("-datadir",GUIUtil::qstringToBoostPath(dataDir).string());
+	QString datafile = dataDir + "/wallet.dat";
+	QFile file(datafile);
+	if (!fs::exists(GUIUtil::qstringToBoostPath(dataDir)) || GetBoolArg("-choosedatadir", false) || !file.exists()) {
+		MnemonicManager *mne = new MnemonicManager();
+
+		QGuiApplication a(argc, argv);
+
+		QQmlApplicationEngine engine;
+		engine.rootContext()->setContextProperty("mnemonicManager", mne);
+		engine.load(QUrl(QStringLiteral("qrc:/qml/app_pages/CreateWalletPage.qml")));
+		QObject *root = engine.rootObjects().at(0);
+
+		a.exec();
+		
+
+		QString mnemonicWords = mne->GetMnemonicWords();
+		std::cout << "mnemonicWords:" << mnemonicWords.toStdString() << "\n";
+		if(mnemonicWords!=""){				
+			SoftSetArg("-mnemonic",mnemonicWords.toStdString());
+		}else{
+			std::cout << "mnemonic words is empty!\n";
+			return false;
+		}
+
+		try {
+            TryCreateDirectory(GUIUtil::qstringToBoostPath(dataDir));
+        } catch (fs::filesystem_error& e) {
+             QMessageBox::critical(0, QString("GKC Core"),
+                    QString("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
+        
+        }
+	}
+	return true;
+}
 
 
 double getScaleRate()
@@ -348,6 +396,8 @@ int main(int argc, char *argv[])
 #endif
 
     // WalletManager walletManager;
+    if(!pickDataDirectory(argc, argv))
+		return 0;
 
     BitcoinApplication app(argc, argv);
 
@@ -379,8 +429,8 @@ int main(int argc, char *argv[])
     uiInterface.Translate.connect(Translate);
 
 
-    if (!Intro::pickDataDirectory())
-        return 0;
+    //if (!Intro::pickDataDirectory())
+    //    return 0;
 
 
     if (!boost::filesystem::is_directory(GetDataDir(false))) {

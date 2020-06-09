@@ -36,6 +36,7 @@ const char* GetTxnOutputType(txnouttype t)
     // gkc-vm
     case TX_CREATE: return "create";
     case TX_CALL: return "call";
+    case TX_CALL2: return "call2";
     case TX_VM_STATE: return "vm_state";
     case TX_EXT_DATA: return "ext_data";
     }
@@ -74,6 +75,10 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
         // Call contract tx
         mTemplates.insert(make_pair(TX_CALL, CScript() << OP_VERSION << OP_GAS_LIMIT << OP_GAS_PRICE
                                     << OP_DATA << OP_PUBKEYHASH << OP_CALL));
+
+		// Call contract tx V2
+		mTemplates.insert(make_pair(TX_CALL2, CScript() << OP_VERSION << OP_GAS_LIMIT << OP_GAS_PRICE
+									<< OP_DATA << OP_PUBKEYHASH << OP_SENDER_PUBKEY << OP_SENDER_SIG << OP_CALL));
 
         // vm state
         mTemplates.insert(make_pair(TX_VM_STATE, CScript() << OP_HASH_STATE_ROOT << OP_HASH_UTXO_ROOT
@@ -220,6 +225,12 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
                     break;
             }
             /////////////////////////////////////////////////////////// //gkc-vm
+            else if (opcode2 == OP_SENDER_PUBKEY)
+            {
+            }
+            else if (opcode2 == OP_SENDER_SIG)
+            {
+            }
             else if (opcode2 == OP_VERSION)
             {
                 if (0 <= opcode1 && opcode1 <= OP_PUSHDATA4)

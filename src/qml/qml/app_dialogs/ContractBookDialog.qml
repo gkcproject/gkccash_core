@@ -194,9 +194,16 @@ CommonDialog
             letterSpacing:0
             enabled:contractTable.selection.count > 0
 
+            ToolTip
+            {
+                id:tooltip_paste
+                text:qsTr("Pasted")
+            }
+
             onClicked:
             {
                 walletModel.setClipBoard(contractTable.model.getData("address",contractTable.currentRow))
+                tooltip_paste.visible = true
             }
         }
 

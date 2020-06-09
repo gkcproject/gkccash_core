@@ -269,6 +269,39 @@ Controls_1_4.Tab {
             text:qsTr("Entrust Record")
             visible:entrustRecordVisible
         }
+
+        CommonDialog
+        {
+            id:detail_dialog
+            title: qsTr("Transaction details")
+            cancel_btn_text: qsTr("Cancel")
+            content_text: "sssssss"
+            width:600
+            height: 400
+            modality: Qt.WindowModal
+            confrim_btn_visible: false
+            property string detail_dialog_str
+
+            Item{
+                parent:detail_dialog.background_rec
+                anchors.fill: parent
+                anchors.topMargin: 25
+
+                CommonTextArea
+                {
+                    id:detailAreaEntruct
+                    font.weight: Font.Light
+                    font.pixelSize:13
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    anchors.bottomMargin: 50
+                    textFormat: Qt.RichText
+                    readOnly: true
+                    wrapMode: TextEdit.Wrap
+                    text:detail_dialog.detail_dialog_str
+                }
+            }
+        }
         
         CommonTableView
         {
@@ -284,7 +317,7 @@ Controls_1_4.Tab {
             
             roles:  ["agent","amount","txid","vout","operation"]
             titles: ["NodeID","Entrusts(GKC)","TXID","VoutIndex","Operation"]
-            widths: [width-1000,200,400,200,200]
+            widths: [520,200,400,200,200]
 			
 			model:walletModel.entrustRecords_Proxy
 			
@@ -294,6 +327,14 @@ Controls_1_4.Tab {
 			{
 				getColumn(4).delegate = operationDelegate1
 			}
+
+			onDoubleClicked:
+            {
+                detail_dialog.detail_dialog_str = walletModel.GetEntructDescription(currentRow)
+                detail_dialog.show()
+            }
+
+            
 			
 			Component {
                 id:textDelegate1
@@ -363,11 +404,17 @@ Controls_1_4.Tab {
 			
 			roles:  ["agent","amount","txid","vout"]
             titles: ["NodeID","Entrusts(GKC)","TXID","VoutIndex"]
-            widths: [width-1000,200,400,200]
+            widths: [520,200,400,200]
 			
 			model:walletModel.redeemRecords_Proxy
 			
 			itemDelegate: textDelegate2
+
+			onDoubleClicked:
+            {
+                detail_dialog.detail_dialog_str = walletModel.GetDepriveDescription(currentRow)
+                detail_dialog.show()
+            }
 			
 			Component {
                 id:textDelegate2
@@ -496,7 +543,7 @@ Controls_1_4.Tab {
                 anchors.topMargin: 25
                 CommonTextArea
                 {
-                    id:detailArea
+                    id:detailAreaRedeem
                     font.weight: Font.Light
                     font.pixelSize:16
                     anchors.fill: parent

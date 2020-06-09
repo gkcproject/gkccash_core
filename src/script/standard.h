@@ -68,7 +68,8 @@ enum txnouttype
     TX_CREATE,   // gkc-vm
     TX_CALL,
     TX_VM_STATE,
-    TX_EXT_DATA
+    TX_EXT_DATA,
+	TX_CALL2,
 
 };
 

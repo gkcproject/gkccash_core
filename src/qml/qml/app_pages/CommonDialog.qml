@@ -41,14 +41,12 @@ Window{
     Shortcut
     {
 
-
     }
 
     Connections
     {
 
     }
-
 
 
     Component.onCompleted:
@@ -67,10 +65,8 @@ Window{
         if(visible)
         {
             if(dim_back){
-                root_window_dim_switch = true
+                //root_window_dim_switch = true
             }
-
-
 
             close_btnRect.color = Qt.rgba(0,0,0,0)
             openWindow.start()
@@ -265,14 +261,11 @@ Window{
     {
         if(!close_timer.running)
         {
-
-
-
             closeWindow.start()
             closeWindow2.start()
             close_timer.start()
             if(dim_back){
-                root_window_dim_switch = false
+                //root_window_dim_switch = false
             }
         }
 

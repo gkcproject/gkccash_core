@@ -93,7 +93,7 @@ endif
 
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += gkc-cli gkc-tx libwallet-demo
+  bin_PROGRAMS += gkc-cli gkc-tx
 endif
 
 .PHONY: FORCE
@@ -191,6 +191,9 @@ BITCOIN_CORE_H = \
   wallet.h \
   wallet_ismine.h \
   walletdb.h \
+  wallet/mnemoniccontainer.h \
+  wallet/bip39.h \
+  wallet/bip39_english.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -206,6 +209,7 @@ BITCOIN_CORE_H = \
   entrustment.h \
   crp/CoinReleasePlan.h \
   scriptex.h \
+  support/allocators/secure.h \
   compat/sanity.h
 
 obj/build.h: FORCE
@@ -293,6 +297,8 @@ libbitcoin_wallet_a_SOURCES = \
   wallet_ismine.cpp \
   walletdb.cpp \
   qml/qt_native/bip39.c \
+  wallet/mnemoniccontainer.cpp \
+  wallet/bip39.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
@@ -361,7 +367,6 @@ libbitcoin_common_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_common_a_SOURCES = \
   accumulators.cpp \
   accumulatormap.cpp \
-  allocators.cpp \
   amount.cpp \
   base58.cpp \
   bip38.cpp \
@@ -517,6 +522,9 @@ libbitcoin_common_a_SOURCES = \
   contract/utils/json_spirit/json_spirit_writer_template.h \
   crp/CoinReleasePlan.cpp \
   scriptex.cpp \
+  sensitivewords.h \
+  sensitivewords.cpp \
+  sensitivewords_words.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
@@ -524,7 +532,8 @@ libbitcoin_common_a_SOURCES = \
 # backward-compatibility objects and their sanity checks are linked.
 libbitcoin_util_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_util_a_SOURCES = \
-  allocators.cpp \
+  support/pagelocker.cpp \
+  support/cleanse.cpp \
   compat/strnlen.cpp \
   compat/glibc_sanity.cpp \
   compat/glibcxx_sanity.cpp \
@@ -627,39 +636,9 @@ gkc_cli_SOURCES += gkc-cli-res.rc
 endif
 gkc_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
-#libwallet-demo
-libwallet_demo_SOURCES = \
-  libwallet_demo.cpp \
-  libwallet/AppWallet.h \
-  libwallet/AppWallet.cpp \
-  libwallet/libwallet.h \
-  libwallet/Lib.h \
-  libwallet/Lib.cpp \
-  libwallet/Rpc.h \
-  libwallet/Rpc.cpp \
-  $(BITCOIN_CORE_H)
-libwallet_demo_CPPFLAGS = $(BITCOIN_INCLUDES)
-libwallet_demo_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-libwallet_demo_LDADD = \
-  $(LIBBITCOIN_SERVER) \
-  $(LIBBITCOIN_COMMON) \
-  $(LIBUNIVALUE) \
-  $(LIBBITCOIN_ZEROCOIN) \
-  $(LIBBITCOIN_UTIL) \
-  $(LIBBITCOIN_CRYPTO) \
-  $(LIBLEVELDB) \
-  $(LIBMEMENV) \
-  $(LIBSECP256K1) \
-  $(LIBLZ4)
-libwallet_demo_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
-libwallet_demo_LDADD += $(LIBBITCOIN_WALLET)
-libwallet_demo_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ETHASH_LIBS) \
-  $(EVMC_LOADER_LIBS) $(EVMC_INSTRUCTIONS_LIBS) $(JSONCPP_LIBS) $(SCRYPT_LIBS) $(CRYPTOPP_LIBS) $(ROCKSDB_LIBS) $(LIBFF_LIBS) $(GMP_LIBS)
-
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/bitcoinconsensus.h
 libbitcoinconsensus_la_SOURCES = \
-  allocators.cpp \
   primitives/transaction.cpp \
   crypto/hmac_sha512.cpp \
   crypto/scrypt.cpp \

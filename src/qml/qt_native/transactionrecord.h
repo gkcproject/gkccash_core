@@ -82,6 +82,7 @@ public:
 		EntrustReward,
 		Entrust,
 		Deprive,
+		GasRefund,
         RecvFromOther,
         SendToSelf,
         ContractRecv,

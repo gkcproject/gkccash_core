@@ -128,13 +128,13 @@ public:
     int nRounds;
 
 #ifdef DPOS
-	enum class Type : uint8_t //类型
+	enum class Type : uint8_t 
 	{
-		DEFAULT, //默认
-		ENTRUST, //委托
-		ENTRUST_REWARD, //委托奖励
-		MN_REWARD, //主节点奖励
-		CREATE_AGENT, //创建AGENT
+		DEFAULT, 
+		ENTRUST, 
+		ENTRUST_REWARD, 
+		MN_REWARD, 
+		CREATE_AGENT, 
 		MONTHLY_REWARD,
 		GAS_REFUND,
 	};
@@ -301,15 +301,14 @@ public:
 #ifdef DPOS
 	enum class Type 
 	{ 
-		DEFAULT, //默认(普通交易)
-		ENTRUST, //委托
-		DEPRIVE, //取消委托
-		CREATE_AGENT, //创建AGENT
-		RESIGN_AGENT, //注销AGENT
+		DEFAULT, 
+		ENTRUST, 
+		DEPRIVE, 
+		CREATE_AGENT, 
+		RESIGN_AGENT, 
 	};
-	Type    type; //交易类型
-	AgentID agentid; //在委托或取消委托交易中表示目标AGENT
-	                 //在Coinstake交易中表示出块的节点AGENT
+	Type    type; 
+	AgentID agentid; 
 
 	typedef string Typename;
 	static Typename defaultTypename;

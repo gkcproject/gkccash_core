@@ -115,8 +115,18 @@ public:
     /** Time Protocol V2 **/
     bool IsTimeProtocolV2(const int nHeight) const;
 
+public:
+	// The block number when Bip39 was implemented
+	int nMnemonicBlock;
+
+	// fork height
+	BlockHeight forkheight_modifyAdPrice;
+	BlockHeight forkheight_clearInactiveUser;
+	BlockHeight forkheight_checkPubkeyAddress;
+	BlockHeight forkheight_lockDepriveTx;
+	
 protected:
-    CChainParams() {}
+    CChainParams();
 
     uint256 hashGenesisBlock;
     MessageStartChars pchMessageStart;

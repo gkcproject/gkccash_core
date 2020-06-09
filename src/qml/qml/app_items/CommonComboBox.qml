@@ -23,6 +23,7 @@ CommonButton
     property alias listview: listview
 
     signal currentIndexChanged(int index)
+    signal currentStringChanged(string index)
     property int currentIndex_: -1
 
     Component.onCompleted:
@@ -99,6 +100,7 @@ CommonButton
                         control.text = item_label.text
                         listview.currentIndex = index
                         control.currentIndexChanged(index)
+                        control.currentStringChanged(control.text)
                         popuper.close()
                     }
 

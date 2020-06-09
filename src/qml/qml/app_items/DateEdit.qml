@@ -11,7 +11,7 @@ TextField
     implicitWidth: 150
     signal dateChanged()
     signal calendarVisibleChanged(bool visible)
-
+	signal btnDown()
 
     function close_calender()
     {
@@ -51,6 +51,7 @@ TextField
         onClicked: {
 			calendar.visible = !calendar.visible
 			calendar.selectedDate = root.text
+			btnDown()
 		}
     }
 	

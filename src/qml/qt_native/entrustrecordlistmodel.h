@@ -59,6 +59,8 @@ public:
 	EntrustRecord GetEntrustRecord(int row);
     CAmount GetTotalAmount();
     QString GetDescription(int row);
+    QString GetEntructDescription(int row);
+	QString GetDepriveDescription(int row);
     QString GetTXID(int row);
 
     Q_INVOKABLE void setcuritem(int index , QVariant  j)

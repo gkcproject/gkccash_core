@@ -946,7 +946,7 @@ void CreateContractPage::createContractClicked(QString gasLimitStr,
 
 
     //FixMe: check if this convert has overflow problem?
-    int func = m_createFunctionArray.at(0);
+    int func = m_createFunctionArray.size() > 0 ? m_createFunctionArray.at(0) : -1;
 
 
     if(gasPrice > HIGH_GASPRICE)
@@ -958,7 +958,7 @@ void CreateContractPage::createContractClicked(QString gasLimitStr,
 
 
     //    // Append params to the list
-
+	byteCode = byteCode.trimmed();
     byteCode = byteCode + toDataHex(func, errorMessage,paramList);
 
 
