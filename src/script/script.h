@@ -178,6 +178,8 @@ enum opcodetype
     OP_EXT_DATA = 0xc7,
 
     // template matching params
+    OP_SENDER_PUBKEY = 0xf1,    //gkc-vm
+    OP_SENDER_SIG = 0xf2,    //gkc-vm
     OP_HASH_STATE_ROOT = 0xf3,    //gkc-vm
     OP_HASH_UTXO_ROOT = 0xf4,    //gkc-vm
     OP_GAS_PRICE = 0xf5,    //gkc-vm

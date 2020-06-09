@@ -8,7 +8,7 @@
 #include "transactiontablemodel.h"
 
 #include <cstdlib>
-
+#include <QDebug>
 #include <QDateTime>
 
 // Earliest date that can be represented (far in the past)
@@ -39,6 +39,7 @@ bool TransactionFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex& 
     QString label = index.data(TransactionTableModel::LabelRole).toString();
     qint64 amount = llabs(index.data(TransactionTableModel::AmountRole).toLongLong());
     int status = index.data(TransactionTableModel::StatusRole).toInt();
+
 
     if (!showInactive && status == TransactionStatus::Conflicted)
         return false;

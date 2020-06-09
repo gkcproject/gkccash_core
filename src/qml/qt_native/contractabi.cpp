@@ -130,7 +130,7 @@ bool FunctionABI::abiIn(const std::vector<std::vector<std::string>> &values, std
     bool ret = inputs.size() == values.size();
     std::string params;
     std::map<int, std::string> mapDynamic;
-    for(size_t i = 0; i < inputs.size(); i++)
+    for(size_t i = 0; i < inputs.size() && i < values.size(); i++)
     {
         ret &= inputs[i].abiIn(values[i], params, mapDynamic);
         errors.push_back(inputs[i].lastError());

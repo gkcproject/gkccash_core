@@ -321,7 +321,7 @@ CommonDialog
             {
 //                if(!root.viewMode !==  root.tableMode)
 //                {
-//                    root_window.warningDialog.title = qsTr("注意")
+//                    root_window.warningDialog.title = qsTr("Tips")
 //                    root_window.warningDialog.content_text = qsTr("Please switch to \"List Mode\" to use this function.")
 //                    root_window.warningDialog.dim_back = false
 //                    root_window.warningDialog.show()

@@ -13,7 +13,6 @@
 #include "uint256.h"
 
 typedef int BlockHeight;
-extern const BlockHeight invalidBlockHeight;
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE_CURRENT = 32000000;
@@ -118,9 +117,6 @@ public:
     // memory only
     mutable CScript payee;
     mutable std::vector<uint256> vMerkleTree;
-	#ifdef DPOS
-	BlockHeight height;
-	#endif
 
     CBlock()
     {

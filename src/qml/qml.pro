@@ -70,6 +70,8 @@ SOURCES += main.cpp \
     qt_native/gkcstrings.cpp \
     qt_native/guiutil.cpp \
     qt_native/networkstyle.cpp \
+	qt_native/notificationlistproxy.cpp\
+	qt_native/notificationlistmodel.cpp\
     qt_native/entrustnodelistmodel.cpp\
     qt_native/entrustnodelistproxy.cpp\	
     qt_native/entrustrecordlistmodel.cpp\
@@ -95,6 +97,7 @@ SOURCES += main.cpp \
     qt_native/walletmodel.cpp \
     qt_native/walletmodeltransaction.cpp \
     qt_native/winshutdownmonitor.cpp \
+	qt_native/mnemonicmanager.cpp\
     bitcoingui.cpp \
     walletmanager.cpp \
     qt_native/rpcconsole.cpp \
@@ -160,7 +163,9 @@ HEADERS += \
     qt_native/csvmodelwriter.h \
     qt_native/guiconstants.h \
     qt_native/guiutil.h \
-    qt_native/networkstyle.h \
+    qt_native/networkstyle.h \	
+	qt_native/notificationlistproxy.h\
+	qt_native/notificationlistmodel.h\
     qt_native/entrustnodelistmodel.h\
     qt_native/entrustnodelistproxy.h\
     qt_native/entrustrecordlistmodel.h\
@@ -186,6 +191,7 @@ HEADERS += \
     qt_native/walletmodel.h \
     qt_native/walletmodeltransaction.h \
     qt_native/winshutdownmonitor.h \
+	qt_native/mnemonicmanager.h\
     bitcoingui.h \
     walletmanager.h \
     qt_native/rpcconsole.h \

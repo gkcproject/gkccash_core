@@ -146,6 +146,16 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
 	redeemRecordsProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
 	redeemRecordsProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
+	notificationRecordsModel = new NotificationListModel(wallet,this);
+	notificationRecordsModel->UpdateNotificationRecordList(0, 0, 5);
+
+	notificationRecordsProxy = new NotificationListProxy(this);
+	notificationRecordsProxy->setSourceModel(notificationRecordsModel);
+	notificationRecordsProxy->setSortRole(Qt::EditRole);
+	notificationRecordsProxy->setDynamicSortFilter(true);
+	notificationRecordsProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+	notificationRecordsProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
     transactionTableModel = new TransactionTableModel(wallet, this);
 
     transactionProxyModel = new TransactionFilterProxy(this);
@@ -183,7 +193,7 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ObfuscationDenominate));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ObfuscationCollateralPayment));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::SendToSelf));
-    typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ContractRecv));
+    //typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ContractRecv));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ContractSend));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Generated));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::StakeMint));
@@ -194,6 +204,9 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_Change_zTsr));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_FromMe));
 	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::EntrustReward));
+	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Entrust));
+	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Deprive));
+	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::GasRefund));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Other));
 
 
@@ -375,6 +388,7 @@ bool WalletModel::existTokenEntry(const CTokenInfo &token)
 
 bool WalletModel::addTokenEntry(const CTokenInfo &token)
 {
+	emit addTokenEntryEmit();
     return wallet->AddTokenEntry(token, true);
 }
 
@@ -386,6 +400,7 @@ bool WalletModel::removeTokenEntry(const std::string &sHash)
 
 bool WalletModel::addTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose)
 {
+	LogPrintf("BBBBBBBBBBBBBB  addTokenTxEntry | tokentx:%s \n",tokenTx.transactionHash.GetHex());
     return wallet->AddTokenTxEntry(tokenTx, fFlushOnClose);
 }
 
@@ -510,9 +525,9 @@ CAmount WalletModel::GetAllProfit()
 
 void WalletModel::InitEntrust()
 {
-	entrustNodeListModel->UpdateNodeList();    //更新节点信息
-    entrustRecordsModel->UpdateEntrustRecordList();   //更新委托记录
-    redeemRecordsModel->UpdateRedeemRecordList();     //更新撤回记录
+	entrustNodeListModel->UpdateNodeList();    
+    entrustRecordsModel->UpdateEntrustRecordList();   
+    redeemRecordsModel->UpdateRedeemRecordList();     
 	cachedEntrusts_ = entrustRecordsModel->GetTotalAmount();
     cachedProfits_ = GetAllProfit();
     emit entrustChanged(cachedBalance,cachedEntrusts_,cachedProfits_);
@@ -525,8 +540,9 @@ bool WalletModel::EntrustOperation(QString nodeid,QString amount,int uint)
     	UniValue params(UniValue::VARR);
     	params.push_back(nodeid.toStdString());
 		qint64 tAmount = getFieldAmount(uint,amount);
-		CAmount nAmount = tAmount/1e+08;
-   		params.push_back(nAmount);
+		double nAmount = tAmount*1.0/1.0e+08;
+		UniValue tmpVal(nAmount);
+   		params.push_back(tmpVal);
     	UniValue result = tableRPC.execute("entrust",params);
     	std::string strPrint;
     	if (result.isNull())
@@ -557,6 +573,47 @@ bool WalletModel::EntrustOperation(QString nodeid,QString amount,int uint)
 	}
     return true;
 }
+
+bool WalletModel::SendAdvertiseOperation(QString title,QString link,QString text)
+{
+	message_ = "";
+	QString author = getAddressTableModel()->addRow(AddressTableModel::Receive, "", "");
+	try{
+		UniValue params(UniValue::VARR);
+		params.push_back(title.toStdString());
+		params.push_back(author.toStdString());
+		params.push_back(text.toStdString());
+		params.push_back(link.toStdString());
+		UniValue result = tableRPC.execute("sendadvertise",params);
+		std::string strPrint;
+    	if (result.isNull())
+    	    strPrint = "";
+    	else if (result.isStr())
+    	    strPrint = result.get_str();
+    	else
+    	    strPrint = result.write();
+		message_ = "hash:\n" + QString::fromStdString(strPrint);
+		QMessageBox *msgBox = new QMessageBox(QMessageBox::Information,"send succes",message_,QMessageBox::Ok);	 
+		msgBox->show();
+	}
+	catch(UniValue& uv)
+	{
+		std::string msg = uv["message"].get_str();
+		message_ = QString::fromStdString(msg);
+		QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,"send error",message_,QMessageBox::Ok);	 
+		msgBox->show();
+		return false;
+	}
+	catch(...)
+	{
+		message_ = "Send advertise error";
+		QMessageBox *msgBox = new QMessageBox(QMessageBox::Critical,"send erro",message_,QMessageBox::Ok);	 
+		msgBox->show();
+		return false;
+	}
+	return true;
+}
+
 
 QString WalletModel::GetMessage()
 {	
@@ -1026,7 +1083,7 @@ CAmount WalletModel::getBalance(const CCoinControl* coinControl) const
 
         return nBalance;
     }
-
+	LogPrintf("------>getBalance   Balance(): %d MasternodeLockedBalance:%d",wallet->GetBalance(),wallet->GetMasternodeLockedBalance());
     return wallet->GetBalance()-wallet->GetMasternodeLockedBalance();
 }
 
@@ -1137,10 +1194,10 @@ void WalletModel::checkTokenBalanceChanged()
 
 void WalletModel::emitBalanceChanged()
 {
-    //更新委托数据
-    entrustNodeListModel->UpdateNodeList();    //更新节点信息
-    entrustRecordsModel->UpdateEntrustRecordList();   //更新委托记录
-    redeemRecordsModel->UpdateRedeemRecordList();     //更新撤回记录
+    //update Entrust data
+    entrustNodeListModel->UpdateNodeList();    
+    entrustRecordsModel->UpdateEntrustRecordList();   
+    redeemRecordsModel->UpdateRedeemRecordList();     
     cachedEntrusts_ = entrustRecordsModel->GetTotalAmount();
     cachedProfits_ = GetAllProfit();
     emit entrustChanged(cachedBalance,cachedEntrusts_,cachedProfits_);
@@ -1192,10 +1249,10 @@ void WalletModel::checkBalanceChanged()
         cachedWatchOnlyBalance = newWatchOnlyBalance;
         cachedWatchUnconfBalance = cachedBalance+cachedUnconfirmedBalance;
         cachedWatchImmatureBalance = cachedBalance+cachedUnconfirmedBalance+cachedZerocoinBalance+newWatchLockBalance;
-		//更新委托数据
-    	entrustNodeListModel->UpdateNodeList();    //更新节点信息
-    	entrustRecordsModel->UpdateEntrustRecordList();   //更新委托记录
-    	redeemRecordsModel->UpdateRedeemRecordList();     //更新撤回记录
+		
+    	entrustNodeListModel->UpdateNodeList();   
+    	entrustRecordsModel->UpdateEntrustRecordList();   
+    	redeemRecordsModel->UpdateRedeemRecordList();     
     	cachedEntrusts_ = entrustRecordsModel->GetTotalAmount();
     	cachedProfits_ = GetAllProfit();
     	emit entrustChanged(cachedBalance,cachedEntrusts_,cachedProfits_);
@@ -1940,3 +1997,40 @@ bool WalletModel::isMine(CBitcoinAddress address)
 {
     return IsMine(*wallet, address.Get());
 }
+
+
+void WalletModel::UpdateNotificationRecordList(int type, int from, int count)
+{
+	notificationRecordsModel->UpdateNotificationRecordList(type, from, count);
+}
+
+bool WalletModel::HaveNotificationNextPage(int type, int from, int count)
+{
+	return notificationRecordsModel->haveNextPage(type, from, count);
+}
+
+
+QString WalletModel::GetNotificationRecord(int index)
+{
+	//NotificationRecord nr = notificationRecordsModel->GetNotificationRecord(index);
+	//if(nr.TITLE()=="")
+	//	return;
+	//emit notificationChanged(index,nr.TITLE(),nr.TIME(),nr.TEXT(),nr.BLOCK(),nr.LINK(),nr.AUTHOR(),nr.HASH());
+	return notificationRecordsModel->GetNotificationRecord(index);
+}
+
+QString WalletModel::GetNotificationTitle(int index)
+{
+	return notificationRecordsModel->GetNotificationTitle(index);
+}
+
+QString WalletModel::GetEntructDescription(int row)
+{
+	return entrustRecordsModel->GetEntructDescription(row);
+}
+
+QString WalletModel::GetDepriveDescription(int row)
+{
+	return redeemRecordsModel->GetDepriveDescription(row);
+}
+

@@ -45,6 +45,26 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
 
     if (!ExtractDestinations(scriptPubKey, type, addresses, nRequired)) {
         out.push_back(Pair("type", GetTxnOutputType(type)));
+		if(type==TX_CALL2)
+		{
+			CBitcoinAddress senderAddress;
+			std::vector<valtype> stack;
+			CPubKey senderPubKey;
+			if(EvalScript(stack, scriptPubKey, SCRIPT_EXEC_BYTE_CODE, BaseSignatureChecker(),nullptr) && stack.size() >= 8)
+			{
+				stack.pop_back(); // opcode
+				stack.pop_back(); // senderSignature				
+				senderPubKey = CPubKey(stack.back().begin(),stack.back().end());
+				//stack.pop_back(); // senderPubKey
+				//stack.pop_back(); // contractaddress
+				//stack.pop_back(); // datahex
+				//stack.pop_back(); // nGasPrice
+				//stack.pop_back(); // nGasLimit
+				//stack.pop_back(); // VersionVM
+				senderAddress = CBitcoinAddress(senderPubKey.GetID());
+			}
+			out.push_back(Pair("sender", senderAddress.ToString()));
+		}
         return;
     }
 

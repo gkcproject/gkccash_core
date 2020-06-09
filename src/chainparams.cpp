@@ -26,6 +26,8 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
+static const BlockHeight forkheight_release = 207282;
+
 /**
  * Main network
  */
@@ -114,6 +116,12 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params() const
     return &ZCParamsHex;
 }
 
+CChainParams::CChainParams()
+{
+	forkheight_checkPubkeyAddress = forkheight_release;
+	forkheight_lockDepriveTx = forkheight_release;
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -179,6 +187,7 @@ public:
 
 
 
+		// 修改块结构后，打开以下注释块，重新计算创世块hash和hashMerkleRoot
 //        bool fNegative;
 //        bool fOverflow;
 //        uint256 bnTarget;
@@ -262,6 +271,10 @@ public:
         nDefaultSecurityLevel = 100; //full security level for accumulators
         //nZerocoinHeaderVersion = 4; //Block headers must be this version once zerocoin is active
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
+
+		nMnemonicBlock = 1;
+		forkheight_clearInactiveUser = forkheight_release;
+		forkheight_modifyAdPrice = forkheight_release; // blockheight in MAINNET
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const

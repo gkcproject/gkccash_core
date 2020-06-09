@@ -221,7 +221,15 @@ UniValue importwallet(const UniValue& params, bool fHelp)
             "\nImport the wallet\n" + HelpExampleCli("importwallet", "\"test\"") +
             "\nImport using the json rpc call\n" + HelpExampleRpc("importwallet", "\"test\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
     EnsureWalletIsUnlocked();
+
+    const CHDChain& chain = pwalletMain->GetHDChain();
+    if(chain.nVersion == chain.VERSION_WITH_BIP39){
+        throw JSONRPCError(RPC_WALLET_ERROR, "Importing wallets and private keys is disabled for mnemonic-enabled wallets."
+                                             "To import your dump file, create a non-mnemonic wallet by setting \"usemnemonic=0\" in your gkc.conf file, after backing up and removing your existing wallet.");
+    }
+
 
     ifstream file;
     file.open(params[0].get_str().c_str(), std::ios::in | std::ios::ate);
@@ -234,6 +242,9 @@ UniValue importwallet(const UniValue& params, bool fHelp)
 
     int64_t nFilesize = std::max((int64_t)1, (int64_t)file.tellg());
     file.seekg(0, file.beg);
+
+    CWalletDB walletdb(pwalletMain->strWalletFile);
+    CKeyID masterKeyID = pwalletMain->GetHDChain().masterKeyID;
 
     pwalletMain->ShowProgress(_("Importing..."), 0); // show progress dialog in GUI
     while (file.good()) {
@@ -261,6 +272,10 @@ UniValue importwallet(const UniValue& params, bool fHelp)
         int64_t nTime = DecodeDumpTime(vstr[1]);
         std::string strLabel;
         bool fLabel = true;
+        // CKeyMetadata
+        bool fHd = false;
+        std::string hdKeypath;
+        CKeyID hdMasterKeyID;
         for (unsigned int nStr = 2; nStr < vstr.size(); nStr++) {
             if (boost::algorithm::starts_with(vstr[nStr], "#"))
                 break;
@@ -272,8 +287,25 @@ UniValue importwallet(const UniValue& params, bool fHelp)
                 strLabel = DecodeDumpString(vstr[nStr].substr(6));
                 fLabel = true;
             }
+            if(!masterKeyID.IsNull() && boost::algorithm::starts_with(vstr[nStr], "hdKeypath=")){
+                hdKeypath = vstr[nStr].substr(10);
+                fHd = true;
+            }
+            if(!masterKeyID.IsNull() && boost::algorithm::starts_with(vstr[nStr], "hdMasterKeyID=")){
+                hdMasterKeyID.SetHex(vstr[nStr].substr(14));
+            }
         }
         LogPrintf("Importing %s...\n", CBitcoinAddress(keyid).ToString());
+
+        // Add entry to mapKeyMetadata (Need to populate KeyMetadata before for it to be written to DB in the following call)
+        if(!masterKeyID.IsNull()){
+            pwalletMain->mapKeyMetadata[keyid].nCreateTime = nTime;
+            if(fHd){
+                pwalletMain->mapKeyMetadata[keyid].hdKeypath = hdKeypath;
+                pwalletMain->mapKeyMetadata[keyid].hdMasterKeyID = hdMasterKeyID;
+                pwalletMain->mapKeyMetadata[keyid].ParseComponents();
+            }
+        }
         if (!pwalletMain->AddKeyPubKey(key, pubkey)) {
             fGood = false;
             continue;
@@ -317,6 +349,7 @@ UniValue dumpprivkey(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("dumpprivkey", "\"myaddress\"") + HelpExampleCli("importprivkey", "\"mykey\"") + HelpExampleRpc("dumpprivkey", "\"myaddress\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
     EnsureWalletIsUnlocked();
 
     string strAddress = params[0].get_str();
@@ -343,6 +376,7 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
             "1. \"filename\"    (string, required) The filename\n"
             "\nExamples:\n" +
             HelpExampleCli("dumpwallet", "\"test\"") + HelpExampleRpc("dumpwallet", "\"test\""));
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     EnsureWalletIsUnlocked();
 
@@ -370,19 +404,85 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
     file << strprintf("# * Best block at time of backup was %i (%s),\n", chainActive.Height(), chainActive.Tip()->GetBlockHash().ToString());
     file << strprintf("#   mined on %s\n", EncodeDumpTime(chainActive.Tip()->GetBlockTime()));
     file << "\n";
+
+    // add the base58check encoded extended master if the wallet uses HD
+    MnemonicContainer mContainer = pwalletMain->GetMnemonicContainer();
+    const CHDChain& chain = pwalletMain->GetHDChain();
+    CKeyID masterKeyID = chain.masterKeyID;
+    if(!mContainer.IsNull() && chain.nVersion >= CHDChain::VERSION_WITH_BIP39)
+    {
+        if(mContainer.IsCrypted())
+        {
+            if(!pwalletMain->DecryptMnemonicContainer(mContainer))
+                throw JSONRPCError(RPC_INTERNAL_ERROR, "Cannot decrypt hd chain");
+        }
+
+        SecureString mnemonic;
+        //Don't dump mnemonic words in case user has set only hd seed during wallet creation
+        if(mContainer.GetMnemonic(mnemonic))
+            file << "# mnemonic: " << mnemonic << "\n";
+
+        SecureVector seed = mContainer.GetSeed();
+        file << "# HD seed: " << HexStr(seed) << "\n\n";
+
+        CExtKey masterKey;
+        masterKey.SetMaster(&seed[0], seed.size());
+
+        CBitcoinExtKey b58extkey;
+        b58extkey.SetKey(masterKey);
+
+        file << "# extended private masterkey: " << b58extkey.ToString() << "\n";
+    }
+    else if (!masterKeyID.IsNull())
+    {
+        CKey key;
+        if (pwalletMain->GetKey(masterKeyID, key))
+        {
+            CExtKey masterKey;
+            masterKey.SetMaster(key.begin(), key.size());
+
+            CBitcoinExtKey b58extkey;
+            b58extkey.SetKey(masterKey);
+
+            file << "# extended private masterkey: " << b58extkey.ToString() << "\n\n";
+        }
+    }
+
     for (std::vector<std::pair<int64_t, CKeyID> >::const_iterator it = vKeyBirth.begin(); it != vKeyBirth.end(); it++) {
         const CKeyID& keyid = it->second;
         std::string strTime = EncodeDumpTime(it->first);
         std::string strAddr = CBitcoinAddress(keyid).ToString();
         CKey key;
+        if(!masterKeyID.IsNull()){
+            if(!pwalletMain->mapKeyMetadata[keyid].ParseComponents())
+                continue;
+        }
         if (pwalletMain->GetKey(keyid, key)) {
+            file << strprintf("%s %s ", CBitcoinSecret(key).ToString(), strTime);
             if (pwalletMain->mapAddressBook.count(keyid)) {
-                file << strprintf("%s %s label=%s # addr=%s\n", CBitcoinSecret(key).ToString(), strTime, EncodeDumpString(pwalletMain->mapAddressBook[keyid].name), strAddr);
+                file << strprintf("label=%s", EncodeDumpString(pwalletMain->mapAddressBook[keyid].name));
+            } else if (keyid == masterKeyID) {
+                file << "hdmaster=1";
             } else if (setKeyPool.count(keyid)) {
-                file << strprintf("%s %s reserve=1 # addr=%s\n", CBitcoinSecret(key).ToString(), strTime, strAddr);
+                file << "reserve=1";
+            } else if (!masterKeyID.IsNull() && pwalletMain->mapKeyMetadata[keyid].hdKeypath == "m") {
+                file << "inactivehdmaster=1";
             } else {
-                file << strprintf("%s %s change=1 # addr=%s\n", CBitcoinSecret(key).ToString(), strTime, strAddr);
+                file << "change=1";
             }
+            if(!masterKeyID.IsNull()){
+                if(pwalletMain->mapKeyMetadata.find(keyid) != pwalletMain->mapKeyMetadata.end()){
+                    if(pwalletMain->mapKeyMetadata[keyid].nVersion >= CKeyMetadata::VERSION_WITH_HDDATA){
+                        string hdKeypath = pwalletMain->mapKeyMetadata[keyid].hdKeypath;
+                        uint160 hdMasterKeyID = pwalletMain->mapKeyMetadata[keyid].hdMasterKeyID;
+                        if(hdKeypath != "")
+                            file << strprintf(" hdKeypath=%s", hdKeypath);
+                        if(!hdMasterKeyID.IsNull())
+                            file << strprintf(" hdMasterKeyID=%s", hdMasterKeyID.ToString());
+                    }
+                }
+            }
+            file << strprintf(" # addr=%s\n", strAddr);
         }
     }
     file << "\n";

@@ -263,6 +263,8 @@ void TokenFilterProxy::chooseName(const QString &name)
 void TokenFilterProxy::setName(const QString _name)
 {
     this->name = _name;
+	if(_name=="All")
+		this->name = "";
     invalidateFilter();
 }
 
@@ -388,7 +390,8 @@ bool TokenFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &source
     int256_t amount(index.data(TokenTransactionTableModel::AmountRole).toString().toStdString());
     amount = abs_int256(amount);
     QString tokenName = index.data(TokenTransactionTableModel::NameRole).toString();
-
+	//std::cout << "111111111111111amount:" << amount << "\n";
+	//std::cout << "222222222222222name:" << name.toStdString() << "\n";
     if(!(TYPE(type) & typeFilter))
         return false;
     if(datetime < dateFrom || datetime > dateTo)

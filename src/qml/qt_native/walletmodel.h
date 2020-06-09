@@ -20,6 +20,8 @@
 #include "recentrequestsfilterproxy.h"
 #include "contractfilterproxy.h"
 #include "tokenfilterproxy.h"
+#include "notificationlistmodel.h"
+#include "notificationlistproxy.h"
 
 #include "coincontrolproxy.h"
 #include "masternodetableproxy.h"
@@ -60,6 +62,8 @@ class QTimer;
 QT_END_NAMESPACE
 
 #define NUM_ITEMS 5
+
+using namespace std;
 
 class SendCoinsRecipient
 {
@@ -125,6 +129,7 @@ public:
 class WalletModel : public QObject
 {
     Q_OBJECT	
+	Q_PROPERTY(NotificationListProxy *notificationRecords_Proxy MEMBER notificationRecordsProxy CONSTANT)
 	Q_PROPERTY(EntrustRecordListProxy *redeemRecords_Proxy MEMBER redeemRecordsProxy CONSTANT)
 	Q_PROPERTY(EntrustRecordListProxy *entrustRecords_Proxy MEMBER entrustRecordsProxy CONSTANT)
 	Q_PROPERTY(EntrustNodeListProxy *nodeList_Proxy MEMBER entrustNodeListProxy CONSTANT)
@@ -170,6 +175,7 @@ public:
     Q_INVOKABLE QString GetEntrustSure(QString nodeID,QString number,QString uint);
     Q_INVOKABLE bool RedeemOperation(QString txid);
     Q_INVOKABLE bool EntrustOperation(QString nodeid,QString amount,int uint);
+	Q_INVOKABLE bool SendAdvertiseOperation(QString title,QString link,QString text);
 	Q_INVOKABLE QString GetMessage();
 	Q_INVOKABLE void InitEntrust();
 	Q_INVOKABLE int GetMyAgentUserNum();
@@ -217,6 +223,15 @@ public:
     // Wallet backup
     Q_INVOKABLE bool backupWallet(const QString& filename);
     Q_INVOKABLE bool checkBackupStatus();
+
+	Q_INVOKABLE void UpdateNotificationRecordList(int type,int from,int count);
+	Q_INVOKABLE bool HaveNotificationNextPage(int type,int from,int count);
+	Q_INVOKABLE QString GetNotificationRecord(int index);
+	Q_INVOKABLE QString GetNotificationTitle(int index);
+
+	Q_INVOKABLE QString GetEntructDescription(int row);
+	Q_INVOKABLE QString GetDepriveDescription(int row);
+
 
     enum StatusCode // Returned by sendCoins
     {
@@ -381,6 +396,9 @@ private:
 	
 	EntrustRecordListModel* redeemRecordsModel;
 	EntrustRecordListProxy* redeemRecordsProxy;
+
+	NotificationListModel* notificationRecordsModel;
+	NotificationListProxy* notificationRecordsProxy;
     
     MainNodeListModel* mainNodesModel;
     MainNodeListProxy* mainNodeListProxy;
@@ -434,6 +452,9 @@ private:
 
     QString m_syncStatus;
 
+	std::vector<PAIR> vecAdverise_;
+	std::vector<PAIR> vecSysmsg_;
+
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
     void checkBalanceChanged();
@@ -447,11 +468,14 @@ signals:
                         const CAmount& totalBalance,
 						const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance, 
                         const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
-    // 委托数据更新
+    
     void entrustChanged(const CAmount& balance,const CAmount& cachedEntrusts,
                         const CAmount& cachedProfits);
     // Encryption status of wallet changed
     void encryptionStatusChanged(int status);
+
+	void notificationChanged(int index,QString title,QString time,QString text,QString nblock,
+					QString link,QString author,QString nhash);
 
     // Signal emitted when wallet needs to be unlocked
     // It is valid behaviour for listeners to keep the wallet locked after this signal;
@@ -489,6 +513,7 @@ signals:
     void badWords();
     void existingAddress();
     void addAddressSuccessful(QString address);
+	void addTokenEntryEmit();
 
 public slots:
     /* Wallet status might have changed */

@@ -1,6 +1,23 @@
 <h1>GKC使用說明</h1>
 
 <ul>
+	<h2>v2.4.0</h2>
+	<h3>1 錢包升級為HD錢包</h3>
+	<p>本功能相容老版本錢包：如果資料目錄中存在舊版本的錢包檔（默認為wallet.dat），運行新版本程式時不會啟用HD錢包功能，老錢包可繼續使用。新版本錢包和舊版本錢包可相互轉帳，不受影響。</p>
+	<h4>用法1：啟用HD錢包</h4>
+	<p>刪除資料目錄中老版本錢包檔，運行程式將創建新的、空的HD錢包。特別提醒：刪除前備份錢包檔！</p>
+	<h4>用法2：查看HD錢包的助記詞</h4>
+	<p>使用RPC命令 getmnemoniccode 可查看當前錢包的助記詞。</p>
+	<h4>用法3：使用助記詞恢復HD錢包</h4>
+	<p>刪除錢包檔，修改設定檔 gkc.conf 添加 mnemonic 配置項和 keypool 配置項，啟動程式後將根據助記詞恢復錢包。以下為配置項示例：</p>
+	<p>mnemonic=depth silent benefit stable replace alien ramp exchange dune antique episode man bacon october trophy lucky craft fault vote announce afford brief advance kiss</p>
+	<p>keypool=1000</p>
+	<p>注意：</p>
+	<p>[1] 以上為示例助記詞，實際使用時請替換為其他助記詞。</p>
+	<p>[2] keypool預設值為1000，用於推導被恢復錢包的地址。可根據舊錢包交易記錄數量或UTXO數量做調整。例如權益節點錢包的UTXO比較多，可適當增大keypool值，如5000或更大。</p>
+	<p>[3] keypool值不宜設置過大，keypool值越大恢復速度越慢。</p>
+	<p>[4] mnemonic和keypool配置項僅在恢復錢包時使用，錢包恢復後可以移除。</p>
+
 	<h2>v2.3.5</h2>
 
 	<h3>1 自動備份錢包</h3>

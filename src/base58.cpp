@@ -264,6 +264,11 @@ bool CBitcoinAddress::IsValid(const CChainParams& params) const
     return fCorrectSize && fKnownVersion;
 }
 
+bool CBitcoinAddress::IsGKC() const
+{
+	return IsValid() && (vchVersion == Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS));
+}
+
 CTxDestination CBitcoinAddress::Get() const
 {
     if (!IsValid())

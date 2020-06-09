@@ -86,6 +86,7 @@ public:
 
         dataDirCustom = new QRadioButton(Intro);
         dataDirCustom->setObjectName(QStringLiteral("dataDirCustom"));
+		dataDirCustom->setEnabled(false);
 
         verticalLayout->addWidget(dataDirCustom);
 

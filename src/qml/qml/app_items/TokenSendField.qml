@@ -32,10 +32,10 @@ Item {
 
         onExecError:
         {
-            root_window.warningDialog.title = qsTr("Error")
-            root_window.warningDialog.content_text = errorMessage
-            root_window.warningDialog.dim_back = false
-            root_window.warningDialog.show()
+            //root_window.warningDialog.title = qsTr("Error")
+            //root_window.warningDialog.content_text = errorMessage
+            //root_window.warningDialog.dim_back = false
+            //root_window.warningDialog.show()
         }
 
     }
@@ -248,6 +248,7 @@ Item {
 
             if(res[0] === "Error send token")
             {
+            	walletModel.tokenItemModel.clearSendToken();
                 root_window.warningDialog.title = res[0]
                 root_window.warningDialog.content_text = res[1]
                 root_window.warningDialog.dim_back = false

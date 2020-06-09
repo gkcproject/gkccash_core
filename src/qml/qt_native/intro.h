@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QMutex>
 #include <QThread>
+#include "mnemonicmanager.h"
 
 
 class FreespaceChecker;
@@ -67,6 +68,7 @@ private:
     QMutex mutex;
     bool signalled;
     QString pathToCheck;
+	static MnemonicManager* mne;
 
     void startThread();
     void checkPath(const QString& dataDir);
@@ -74,5 +76,54 @@ private:
 
     friend class FreespaceChecker;
 };
+
+
+#include <QThread>
+#include <QQmlApplicationEngine>
+#include <QQuickWindow>
+#include <QQmlContext>
+
+class MnemonicThread : public QThread
+{
+	Q_OBJECT
+public:
+	MnemonicThread(MnemonicManager *mne){
+		mne_ = mne;	
+		isStop = false;
+	}
+
+public slots:
+	void closeThread(){
+		isStop = true;
+	}
+	
+protected:
+	virtual void run(){
+		QQmlApplicationEngine engine;
+		engine.rootContext()->setContextProperty("mnemonicManager", mne_);
+		engine.load(QUrl(QStringLiteral("qrc:/qml/app_pages/CreateWalletPage.qml")));
+		QObject *root = engine.rootObjects()[0];
+
+		std::cout << "bbbbbbbbbbbbb\n";
+
+    	QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+    	window->setFlags(Qt::FramelessWindowHint
+					| Qt::WindowSystemMenuHint
+                 	| Qt::WindowMinimizeButtonHint
+                 	| Qt::Window);
+		window->show();
+		while(1){
+			if(isStop)
+				return;
+			sleep(1);
+		}
+	}
+	
+
+private:
+	bool isStop;
+	MnemonicManager *mne_;
+};
+
 
 #endif // BITCOIN_QT_INTRO_H

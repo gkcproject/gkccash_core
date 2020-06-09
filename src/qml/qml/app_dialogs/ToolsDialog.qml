@@ -843,7 +843,7 @@ Deletes all local blockchain folders so the wallet synchronizes from scratch.")
             }
 
 
-            Controls_1_4.Tab {
+            /*Controls_1_4.Tab {
                 title: qsTr("Add Address")
 
 
@@ -966,7 +966,7 @@ Deletes all local blockchain folders so the wallet synchronizes from scratch.")
 
                 }
 
-            }
+            }*/
 
 
         }

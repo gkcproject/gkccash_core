@@ -1156,6 +1156,10 @@ Address: %4
     <message>
         <source>Select</source>
         <translation>选择</translation>
+    </message>	
+    <message>
+        <source>Pasted</source>
+        <translation>已复制</translation>
     </message>
 </context>
 <context>
@@ -1775,6 +1779,10 @@ Click icon below to backup your wallet!</source>
     <message>
         <source>Equity Entrust</source>
         <translation>权益委托</translation>
+    </message>
+	<message>
+        <source>Notification</source>
+        <translation>广告通知</translation>
     </message>
     <message>
         <source>Smart Contract</source>
@@ -4089,6 +4097,10 @@ to your wallet!
     <message>
         <source>EntrustNumber</source>
         <translation>委托数量</translation>
+    </message>
+	<message>
+        <source>DepriveNumber</source>
+        <translation>赎回数量</translation>
     </message>
     <message>
         <source>NodeID</source>

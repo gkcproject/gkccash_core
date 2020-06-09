@@ -47,7 +47,7 @@ Controls_1_4.TableView {
     Component.onCompleted: {
 
         if(add_index_column)
-            tableview.addColumn(prepare_column_elements("index", "序号", index_column_width))
+            tableview.addColumn(prepare_column_elements("index", "order number", index_column_width))
 
         tableview.add_column()
 

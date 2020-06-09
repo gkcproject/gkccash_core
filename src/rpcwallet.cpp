@@ -309,6 +309,7 @@ void SendMoneyEx(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNe
 		throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount");
 
 #ifdef DPOS
+	//check nValue with non-deprive tx only.
 	if(wtxNew.GetType() != CTransaction::Type::DEPRIVE)
 #endif
 	if (nValue > pwalletMain->GetBalance())
@@ -582,7 +583,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
             HelpExampleCli("sendtoaddress", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1") + HelpExampleCli("sendtoaddress", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1 \"donation\" \"seans outpost\"") + HelpExampleRpc("sendtoaddress", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\", 0.1, \"donation\", \"seans outpost\""));
 
     CBitcoinAddress address(params[0].get_str());
-    if (!address.IsValid())
+	if(!address.IsGKC())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid GKC address");
 
     // Amount
@@ -623,7 +624,7 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
             HelpExampleCli("sendtoaddressix", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1") + HelpExampleCli("sendtoaddressix", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1 \"donation\" \"seans outpost\"") + HelpExampleRpc("sendtoaddressix", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\", 0.1, \"donation\", \"seans outpost\""));
 
     CBitcoinAddress address(params[0].get_str());
-    if (!address.IsValid())
+    if (!address.IsGKC())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid GKC address");
 
     // Amount
@@ -660,7 +661,7 @@ UniValue selectutxotosend(const UniValue& params, bool fHelp)
             HelpExampleCli("selectutxotosend", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1 0.01") + HelpExampleCli("selectutxotosend", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\" 0.1 0.01 \"donation\" \"seans outpost\"") + HelpExampleRpc("selectutxotosend", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\", 0.1, 0.01, \"donation\", \"seans outpost\""));
 
     CBitcoinAddress address(params[0].get_str());
-    if (!address.IsValid())
+	if(!address.IsGKC())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid GKC address");
 
     // Amount
@@ -1105,7 +1106,7 @@ UniValue sendfrom(const UniValue& params, bool fHelp)
 
     string strAccount = AccountFromValue(params[0]);
     CBitcoinAddress address(params[1].get_str());
-    if (!address.IsValid())
+    if (!address.IsGKC())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid GKC address");
     CAmount nAmount = AmountFromValue(params[2]);
     int nMinDepth = 1;
@@ -1175,7 +1176,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     vector<string> keys = sendTo.getKeys();
     BOOST_FOREACH(const string& name_, keys) {
         CBitcoinAddress address(name_);
-        if (!address.IsValid())
+        if (!address.IsGKC())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid GKC address: ") + name_);
 
         if (setAddress.count(address))
@@ -1252,7 +1253,7 @@ UniValue selectutxotosendmany(const UniValue& params, bool fHelp)
     vector<string> keys = sendTo.getKeys();
     BOOST_FOREACH(const string& name_, keys) {
         CBitcoinAddress address(name_);
-        if (!address.IsValid())
+        if (!address.IsGKC())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid GKC address: ") + name_);
 
         if (setAddress.count(address))
@@ -2379,6 +2380,9 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("keypoolsize", (int)pwalletMain->GetKeyPoolSize()));
     if (pwalletMain->IsCrypted())
         obj.push_back(Pair("unlocked_until", nWalletUnlockTime));
+    CKeyID masterKeyID = pwalletMain->GetHDChain().masterKeyID;
+    if (!masterKeyID.IsNull())
+         obj.push_back(Pair("hdmasterkeyid", masterKeyID.GetHex()));
     return obj;
 }
 
@@ -2956,7 +2960,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
     if (params.size() > 5)
     {
         senderAddress.SetString(params[5].get_str());
-        if (!senderAddress.IsValid())
+        if (!senderAddress.IsGKC())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Gkc address to send from");
         else
             fHasSender = true;
@@ -2976,44 +2980,25 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
 
     CCoinControl coinControl;
 
-    if (fHasSender)
+    if (!fHasSender)
     {
-
-        UniValue results(UniValue::VARR);
         std::vector<COutput> vecOutputs;
-
-        coinControl.fAllowOtherInputs = true;
-
         assert(pwalletMain != NULL);
         pwalletMain->AvailableCoins(vecOutputs, true, NULL, false);
-
-        //        BOOST_FOREACH(const COutput& out, vecOutputs) {
         for (const COutput &out : vecOutputs)
         {
             CTxDestination address;
             const CScript &scriptPubKey = out.tx->vout[out.i].scriptPubKey;
-            bool fValidAddress = ExtractDestination(scriptPubKey, address);
-
-            CBitcoinAddress destAdress(address);
-
-            if (!fValidAddress || senderAddress.Get() != destAdress.Get())
-                continue;
-
-            coinControl.Select(COutPoint(out.tx->GetHash(), out.i));
-
+            if(!ExtractDestination(scriptPubKey, address))
+				continue;
+			senderAddress = CBitcoinAddress(address);
             break;
-
-        }
-
-        if (!coinControl.HasSelected())
-        {
-            throw JSONRPCError(RPC_TYPE_ERROR, "Sender address does not have any unspent outputs");
-        }
-        if (fChangeToSender)
-        {
-            coinControl.destChange = senderAddress.Get();
         }
     }
+	if (fChangeToSender)
+	{
+		coinControl.destChange = senderAddress.Get();
+	}
 
     CWalletTx wtx;
 
@@ -3030,10 +3015,16 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
     if (nAmount + nGasFee > curBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
 
+	CKeyID senderKeyid;
+	CPubKey senderPubKey;
+	if(!senderAddress.GetKeyID(senderKeyid) ||	!pwalletMain->GetPubKey(senderKeyid, senderPubKey))
+		throw JSONRPCError(RPC_INVALID_PARAMETER, "Unable to obtain the public key of the sender's address.");	
     // Build OP_EXEC_ASSIGN script
-    CScript scriptPubKey = CScript() << CScriptNum(VersionVM::GetEVMDefault().toRaw()) << CScriptNum(nGasLimit)
-                                     << CScriptNum(nGasPrice) << ParseHex(datahex) << ParseHex(contractaddress)
-                                     << OP_CALL;
+    CScript script = CScript() 
+	    << CScriptNum(VersionVM::GetEVMDefault().toRaw()) << CScriptNum(nGasLimit)
+		<< CScriptNum(nGasPrice) << ParseHex(datahex) << ParseHex(contractaddress)
+		<< valtype(senderPubKey.begin(),senderPubKey.end()) << OP_CALL;
+	// VERY CRITICAL !!! The new script in CreateTransaction() will replace the script here
 
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
@@ -3042,7 +3033,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
     std::vector<std::pair<CScript, CAmount>> vecSend;
     int nChangePosRet = -1;
 
-    vecSend.push_back(std::make_pair(scriptPubKey, nAmount));
+    vecSend.push_back(std::make_pair(script, nAmount));
 
     if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, strError, &coinControl, ALL_COINS, false, 0, nGasFee, fHasSender))
     {
@@ -3051,15 +3042,6 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
                     "Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!",
                     FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
-    }
-
-    CTxDestination txSenderDest;
-    ExtractDestination(pwalletMain->mapWallet[wtx.vin[0].prevout.hash].vout[wtx.vin[0].prevout.n].scriptPubKey,
-                       txSenderDest);
-
-    if (fHasSender && !(senderAddress.Get() == txSenderDest))
-    {
-        throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
     }
 
     UniValue result(UniValue::VOBJ);
@@ -3071,7 +3053,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
         // check contract tx
         if (!CheckTransaction(wtx, height >= Params().Zerocoin_StartHeight(), false, state)) // state filled in by CheckTransaction
         {
-            throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
+            throw JSONRPCError(RPC_TYPE_ERROR, "Contract tx check failed, transaction was not committed!");
         }
 
         CAmount nMinGasPrice = 0;
@@ -3113,13 +3095,8 @@ UniValue sendtocontract(const UniValue& params, bool fHelp)
 
         std::string txId = wtx.GetHash().GetHex();
         result.push_back(Pair("txid", txId));
-
-        CBitcoinAddress txSenderAdress(txSenderDest);
-        CKeyID keyid;
-        txSenderAdress.GetKeyID(keyid);
-
-        result.push_back(Pair("sender", txSenderAdress.ToString()));
-        result.push_back(Pair("hash160", HexStr(valtype(keyid.begin(), keyid.end()))));
+        result.push_back(Pair("sender", senderAddress.ToString()));
+        result.push_back(Pair("hash160", HexStr(valtype(senderKeyid.begin(), senderKeyid.end()))));
     } else
     {
         std::string strHex = EncodeHexTx(wtx);
@@ -3243,6 +3220,7 @@ UniValue sendextenddata(const UniValue& params, bool fHelp)
                     }
                     break;
 
+                
                 case EXT_DATA_BOOL:
                     if (value.isBool()) {
                         if (value.get_bool())
@@ -4567,7 +4545,7 @@ UniValue listagents(const UniValue& params, bool fHelp)
 			agentObj.push_back(Pair("name",agent.name));
 			agentObj.push_back(Pair("lastBlockTime",agent.lastBlockTime));
 			agentObj.push_back(Pair("receivedTotalAmount",agent.receivedTotalAmount));
-			agentObj.push_back(Pair("Users",agent.userStatistics.size()));
+			agentObj.push_back(Pair("Users",agent.GetActiveUserCount()));
 			agentObj.push_back(Pair("TotalDealDivideAmount",agent.GetTotalDealDivideAmount()));
 			agentObj.push_back(Pair("TotalDividendAmount",agent.GetTotalDividendAmount()));
 			agentArray.push_back(agentObj);
@@ -5089,6 +5067,35 @@ UniValue listadfilter(const UniValue& params, bool fHelp)
 		result.push_back(adObj);
 	}
 
+	return result;
+}
+
+UniValue getmnemoniccode(const UniValue& params, bool fHelp)
+{
+    if (fHelp)
+        throw runtime_error(
+            "getmnemoniccode\n"
+            "\nDumps mnemonic code in wallet.\n");
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+	std::string result;
+	
+    MnemonicContainer mContainer = pwalletMain->GetMnemonicContainer();
+    const CHDChain& chain = pwalletMain->GetHDChain();
+    if(!mContainer.IsNull() && chain.nVersion >= CHDChain::VERSION_WITH_BIP39)
+    {
+        if(mContainer.IsCrypted())
+        {
+            if(!pwalletMain->DecryptMnemonicContainer(mContainer))
+                throw JSONRPCError(RPC_INTERNAL_ERROR, "Cannot decrypt hd chain");
+        }
+
+        SecureString mnemonic;
+        if(mContainer.GetMnemonic(mnemonic))
+            result = mnemonic.c_str();
+    }
 	return result;
 }
 

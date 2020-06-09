@@ -16,6 +16,11 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QQuickView>
+#include <QQmlContext>
+#include <QEventLoop>
+#include <QQmlApplicationEngine>
+
 
 /* Minimum free space (in bytes) needed for data directory */
 static const uint64_t GB_BYTES = 1000000000LL;
@@ -160,27 +165,60 @@ bool Intro::pickDataDirectory()
 
     if (!fs::exists(GUIUtil::qstringToBoostPath(dataDir)) || GetBoolArg("-choosedatadir", false)) {
         /* If current default data directory does not exist, let the user choose one */
-        Intro intro;
-        intro.setDataDirectory(dataDir);
-        intro.setWindowIcon(QIcon(":icons/bitcoin"));
+        //Intro intro;
+        //intro.setDataDirectory(dataDir);
+        //intro.setWindowIcon(QIcon(":icons/bitcoin"));
 
-        while (true) {
-            if (!intro.exec()) {
+        //while (true) {
+        //    if (!intro.exec()) {
                 /* Cancel clicked */
-                return false;
-            }
-            dataDir = intro.getDataDirectory();
-            try {
-                TryCreateDirectory(GUIUtil::qstringToBoostPath(dataDir));
-                break;
-            } catch (fs::filesystem_error& e) {
-                QMessageBox::critical(0, tr("GKC Core"),
-                    tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
+        //        return false;
+        //    }
+        //    dataDir = intro.getDataDirectory();
+        //    try {
+        //        TryCreateDirectory(GUIUtil::qstringToBoostPath(dataDir));
+        //        break;
+        //    } catch (fs::filesystem_error& e) {
+        //        QMessageBox::critical(0, tr("GKC Core"),
+        //            tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
                 /* fall through, back to choosing screen */
-            }
-        }
+        //    }
+        //}
+        //Intro::mne = new MnemonicManager();
 
-        settings.setValue("strDataDir", dataDir);
+		//QQuickView view;
+	    //view.rootContext()->setContextProperty("mnemonicManager", Intro::mne);
+	    //view.setSource(QUrl("qrc:/qml/app_pages/CreateWalletPage.qml"));
+		//view.show();
+
+		//QQmlApplicationEngine engine;
+		//engine.rootContext()->setContextProperty("mnemonicManager", mne);
+		//engine.load(QUrl(QStringLiteral("qrc:/qml/app_pages/CreateWalletPage.qml")));
+	
+		//QEventLoop loop;
+		//QObject::connect(&mne, SIGNAL(mnemonicFinished()), &loop, SLOT(quit()));
+		//loop.exec(QEventLoop::ExcludeUserInputEvents);
+			
+		//QString mnemonicWords = mne->GetMnemonicWords();
+		//std::cout << "mnemonicWords:" << mnemonicWords.toStdString() << "\n";
+		//if(mnemonicWords!=""){				
+		//	settings.setValue("-mnemonic",mnemonicWords);
+		//}else{
+		//	std::cout << "ccccccccccccccc\n";
+		//	return false;
+		//}
+
+		
+
+		try {
+            TryCreateDirectory(GUIUtil::qstringToBoostPath(dataDir));
+        } catch (fs::filesystem_error& e) {
+             QMessageBox::critical(0, tr("GKC Core"),
+                    tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
+        
+        }
+				
+        //settings.setValue("strDataDir", dataDir);
     }
     /* Only override -datadir if different from the default, to make it possible to
      * override -datadir in the gkc.conf file in the default data directory

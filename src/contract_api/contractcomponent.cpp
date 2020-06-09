@@ -34,6 +34,53 @@ bool CheckMinGasPrice(std::vector<EthTransactionParams> &etps, const uint64_t &m
 valtype
 GetSenderAddress(const CTransaction &tx, const CCoinsViewCache *coinsView, const std::vector<CTransaction> *blockTxs)
 {
+	bool newVersion = false;
+	valtype senderSignature;
+	CPubKey senderPubKey;
+	{
+		std::vector<valtype> stack;
+		for (size_t i = 0; i < tx.vout.size(); i++)
+		{
+			const CScript& script = tx.vout[i].scriptPubKey;
+			if (script.HasOpCreate() || script.HasOpCall())
+			{
+				if(!EvalScript(stack, script, SCRIPT_EXEC_BYTE_CODE, BaseSignatureChecker(),nullptr))
+					continue;
+				break;
+			}
+		}
+		LogPrint("contract","GetSenderAddress | stack.size()=%d\n",stack.size());
+		if(stack.size() > 0)
+		{
+			opcodetype opcode = (opcodetype)(*stack.back().begin());
+			stack.pop_back(); // opcode
+			LogPrint("contract","GetSenderAddress | opcode=%d\n",opcode);
+			if(opcode==OP_CALL)
+			{
+				LogPrint("contract","GetSenderAddress | extend stack.size()=%d\n",stack.size());
+				if(stack.size() >= 7)
+				{
+					newVersion = true;
+					senderSignature = stack.back();
+					stack.pop_back(); // senderSignature				
+					senderPubKey = CPubKey(stack.back().begin(),stack.back().end());
+					stack.pop_back(); // senderPubKey
+				}
+				stack.pop_back(); // contractaddress
+				stack.pop_back(); // datahex
+				stack.pop_back(); // nGasPrice
+				stack.pop_back(); // nGasLimit
+				stack.pop_back(); // VersionVM
+			}
+		}
+	}
+
+	if(newVersion)
+	{
+		CKeyID keyid = senderPubKey.GetID();
+		return valtype(keyid.begin(),keyid.end());
+	}
+
     CScript script;
     bool scriptFilled = false; //can't use script.empty() because an empty script is technically valid
 
@@ -1397,6 +1444,13 @@ bool GkcTxConverter::parseEthTXParams(EthTransactionParams &params)
 {
     try
     {
+		const bool isVersion2 = (stack.size() == 7);
+		if(isVersion2)
+		{
+			stack.pop_back(); //senderSignature
+			stack.pop_back(); //senderPubKey
+		}
+		
         dev::Address receiveAddress;
         valtype vecAddr;
         if (opcode == OP_CALL)

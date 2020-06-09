@@ -5,6 +5,7 @@
 #include "wallet.h"
 #include "pubkey.h"
 #include "init.h"
+#include "sensitivewords.h"
 
 using namespace op_return_type;
 using namespace advertisement;
@@ -399,8 +400,7 @@ bool advertisement::AdminSign(const CKeyStore& keystore, uint256 hash, vector<un
 
 bool advertisement::FilterAd(const Advertise& ad)
 {
-	// todo
-	return false;
+	return advertisement::SensitiveWordsLib::GetInstance().Match(ad.text);
 }
 
 

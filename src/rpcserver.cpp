@@ -444,6 +444,8 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "sendtocontract", &sendtocontract, false, false, true},
         {"wallet", "sendextenddata", &sendextenddata, false, false, true},
         {"wallet", "getextenddata", &getextenddata, false, false, true},
+        {"wallet", "getmnemoniccode", &getmnemoniccode, false, false, true},
+        
 #ifdef DPOS
 		{"wallet", "createentrustagent", &createentrustagent, false, false, true},
 		{"wallet", "listmyagentid", &listmyagentid, false, false, true},

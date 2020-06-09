@@ -81,8 +81,17 @@ Item {
         implicitWidth: 100
         text:qsTr("Copy Address")
         color: "#FDA205"
-
-        onClicked:walletModel.setClipBoard(addressLabel.text)
+		ToolTip
+        {
+            id:tooltip_paste
+            text:qsTr("Pasted")
+        }
+        
+        onClicked:
+        {
+        	walletModel.setClipBoard(addressLabel.text)
+        	tooltip_paste.visible = true
+        }
     }
 
 

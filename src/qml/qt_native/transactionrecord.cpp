@@ -85,10 +85,17 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             //stake reward
             isminetype mine = wallet->IsMine(wtx.vout[1]);
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-            sub.type = TransactionRecord::StakeMint;
-            sub.address = CBitcoinAddress(address).ToString();
-            sub.credit = nNet;
-        	parts.append(sub);
+			sub.address = CBitcoinAddress(address).ToString();
+			sub.credit = nNet;
+			
+			CTxDestination outAddress;
+			if(wtx.vout[1].IsGasRefund())
+			{
+				sub.type = TransactionRecord::GasRefund;
+			} else {
+				sub.type = TransactionRecord::StakeMint;
+			}
+			parts.append(sub);
         }
     } else if (wtx.IsZerocoinSpend()) {
         // a zerocoin spend that was created by this wallet
@@ -255,9 +262,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                     const CTxOut& txout = wtx.vout[nOut];
                     sub.idx = parts.size();
 
-                    if (wallet->IsCollateralAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
-                    if (wallet->IsDenominatedAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationCreateDenominations;
-                    if (nDebit - wtx.GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
+                    //if (wallet->IsCollateralAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
+                    //if (wallet->IsDenominatedAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationCreateDenominations;
+                    //if (nDebit - wtx.GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
                 }
             }
 
@@ -272,49 +279,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             // Debit
             //
             CAmount nTxFee = nDebit - wtx.GetValueOut();
-
-            for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
-                const CTxOut& txout = wtx.vout[nOut];
-                TransactionRecord sub(hash, nTime);
-                sub.idx = parts.size();
-                sub.involvesWatchAddress = involvesWatchAddress;
-
-                if (wallet->IsMine(txout)) {
-                    // Ignore parts sent to self, as this is usually the change
-                    // from a transaction sent back to our own address.
-                    continue;
-                }
-
-                CTxDestination address;
-                if (ExtractDestination(txout.scriptPubKey, address)) {
-                    // Sent to GKC Address
-                    sub.type = TransactionRecord::SendToAddress;
-                    sub.address = CBitcoinAddress(address).ToString();
-                } else if (txout.IsZerocoinMint()){
-                    sub.type = TransactionRecord::ZerocoinMint;
-                    sub.address = mapValue["zerocoinmint"];
-                } else {
-                    // Sent to IP, or other non-address transaction like OP_EVAL
-                    sub.type = TransactionRecord::SendToOther;
-                    sub.address = mapValue["to"];
-                }
-
-                if (mapValue["DS"] == "1") {
-                    sub.type = TransactionRecord::Obfuscated;
-                }
-
-                CAmount nValue = txout.nValue;
-                /* Add fee to first output */
-                if (nTxFee > 0) {
-                    nValue += nTxFee;
-                    nTxFee = 0;
-                }
-                sub.debit = -nValue;
-
-                parts.append(sub);
-            }
-
-            if(wtx.HasCreateOrCall()){
+			if(wtx.HasCreateOrCall()){
                 TransactionRecord sub(hash, nTime);
                 sub.idx = 0;
                 sub.credit = nNet;
@@ -329,6 +294,48 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 }
 
                 parts.append(sub);
+            } else {
+	            for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
+	                const CTxOut& txout = wtx.vout[nOut];
+	                TransactionRecord sub(hash, nTime);
+	                sub.idx = parts.size();
+	                sub.involvesWatchAddress = involvesWatchAddress;
+
+	                if (wallet->IsMine(txout)) {
+	                    // Ignore parts sent to self, as this is usually the change
+	                    // from a transaction sent back to our own address.
+	                    continue;
+	                }
+
+	                CTxDestination address;
+	                if (ExtractDestination(txout.scriptPubKey, address)) {
+	                    // Sent to GKC Address
+	                    sub.type = TransactionRecord::SendToAddress;
+	                    sub.address = CBitcoinAddress(address).ToString();
+	                } else if (txout.IsZerocoinMint()){
+	                    sub.type = TransactionRecord::ZerocoinMint;
+	                    sub.address = mapValue["zerocoinmint"];
+	                } else {
+	                    // Sent to IP, or other non-address transaction like OP_EVAL
+	                    sub.type = TransactionRecord::SendToOther;
+	                    sub.address = mapValue["to"];
+	                }
+
+	                if (mapValue["DS"] == "1") {
+	                    sub.type = TransactionRecord::Obfuscated;
+	                }
+
+	                CAmount nValue = txout.nValue;
+	                /* Add fee to first output */
+	                if (nTxFee > 0) {
+	                    nValue += nTxFee;
+	                    nTxFee = 0;
+	                }
+	                sub.debit = -nValue;
+
+	                parts.append(sub);
+	            }
+
             }
 
 

@@ -17,8 +17,6 @@
 #include "crypto/common.h"
 #include "crypto/scrypt.h"
 
-const BlockHeight invalidBlockHeight = -1;
-
 uint256 CBlockHeader::GetHash() const
 {
     if(nVersion < ZEROCOIN_VERSION)
@@ -46,9 +44,6 @@ void CBlock::SetNull()
 	vMerkleTree.clear();
 	payee = CScript();
 	vchBlockSig.clear();
-	#ifdef DPOS
-	height = invalidBlockHeight;
-	#endif
 }
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const

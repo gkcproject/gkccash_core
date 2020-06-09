@@ -42,6 +42,7 @@
 #include "accumulators.h"
 
 #endif
+#include "wallet/bip39.h"
 
 #include <fstream>
 #include <stdint.h>
@@ -808,8 +809,9 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     if (mapArgs.count("-blockaddress")) {
+		//set address to receive block reward
 		CBitcoinAddress address(mapArgs["-blockaddress"]);
-		if (!address.IsValid()) {
+		if (!address.IsGKC()) {
 			InitError(_("Invalid GKC address for -blockaddress=<address>"));
 			return false;
 		}
@@ -828,6 +830,28 @@ bool AppInit2(boost::thread_group& threadGroup)
 		Entrustment::GetInstance().SetMyAgentID(agentid);
 	}
 #endif
+
+    // Forcing all mnemonic settings off if -usehd is off.
+    if (!GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET)) {
+        if (SoftSetBoolArg("-usemnemonic", false) && SoftSetArg("-mnemonic", "") && SoftSetArg("-mnemonicpassphrase", "") && SoftSetArg("-hdseed", "not hex"))
+            LogPrintf("%s: Potential  parameter interaction: -usehd=0 -> setting -usemnemonic=0, -mnemonic=\"\", -mnemonicpassphrase=\"\", -hdseed=\"not hex\"\n", __func__);
+    }
+
+    // Forcing all remaining mnemonic settings off if -usemnemonic is off.
+    if (!GetBoolArg("-usemnemonic", DEFAULT_USE_MNEMONIC)) {
+        if (SoftSetArg("-mnemonic", "") && SoftSetArg("-mnemonicpassphrase", "") && SoftSetArg("-hdseed", "not hex"))
+            LogPrintf("%s: Potential parameter interaction: -usemnemonic=0 -> setting -mnemonic=\"\", -mnemonicpassphrase=\"\"\n, -hdseed=\"not hex\"\n", __func__);
+    }
+
+	// Do not support 12 words with mnemonic
+	if(!GetArg("-mnemonic", "").empty()){
+		string words = GetArg("-mnemonic", "");
+		if(std::count(words.begin(),words.end(),' ') < 23)
+			return InitError(_("Number of mnemonic code must be 24!"));
+		if(!Mnemonic::mnemonic_check(SecureString(words.c_str())))
+			return InitError(strprintf(_("Mnemonic code error: %s"),words));
+
+	}
 
     // Make sure enough file descriptors are available
     int nBind = std::max((int)mapArgs.count("-bind") + (int)mapArgs.count("-whitebind"), 1);
@@ -1558,6 +1582,8 @@ bool AppInit2(boost::thread_group& threadGroup)
         // needed to restore wallet transaction meta data after -zapwallettxes
         std::vector<CWalletTx> vWtx;
 
+		const std::string& walletFile = strWalletFile;
+
         if (GetBoolArg("-zapwallettxes", false)) {
             uiInterface.InitMessage(_("Zapping all transactions from wallet..."));
 
@@ -1577,7 +1603,9 @@ bool AppInit2(boost::thread_group& threadGroup)
 
         nStart = GetTimeMillis();
         bool fFirstRun = true;
+		bool fRecoverMnemonic = false;
         pwalletMain = new CWallet(strWalletFile);
+		CWallet *walletInstance = pwalletMain;
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
         if (nLoadWalletRet != DB_LOAD_OK) {
             if (nLoadWalletRet == DB_CORRUPT)
@@ -1612,7 +1640,28 @@ bool AppInit2(boost::thread_group& threadGroup)
 
         if (fFirstRun) {
             // Create new keyUser and set as default key
+	        if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && walletInstance->hdChain.masterKeyID.IsNull()) {
+	            if(GetBoolArg("-usemnemonic", DEFAULT_USE_MNEMONIC)) {
+	                if (GetArg("-mnemonicpassphrase", DEFAULT_MNEMONIC_PASSPHRASE).size() > 256) {
+	                    throw std::runtime_error(std::string(__func__) + ": Mnemonic passphrase is too long, must be at most 256 characters");
+	                }
+	                // generate a new HD chain
+	                walletInstance->GenerateNewMnemonic();
+	                walletInstance->SetMinVersion(FEATURE_HD);
+	                /* set rescan to true.
+	                 * if blockchain data is not present it has no effect, but it's needed for a mnemonic restore where chain data is present.
+	                 */
+	                SoftSetBoolArg("-rescan", true);
+	                fRecoverMnemonic = true;
+	            }else{
+	            // generate a new master key
+	            CPubKey masterPubKey = walletInstance->GenerateNewHDMasterKey();
+	            if (!walletInstance->SetHDMasterKey(masterPubKey, CHDChain().VERSION_WITH_BIP44))
+	                throw std::runtime_error(std::string(__func__) + ": Storing master key failed");
+	            }
+	        }
             RandAddSeedPerfmon();
+			pwalletMain->NewKeyPool();
 
             CPubKey newDefaultKey;
             if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
@@ -1622,7 +1671,17 @@ bool AppInit2(boost::thread_group& threadGroup)
             }
 
             pwalletMain->SetBestChain(chainActive.GetLocator());
-        }
+        } else if (mapArgs.count("-usehd")) {
+	        bool useHD = GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET);
+	        if (!walletInstance->hdChain.masterKeyID.IsNull() && !useHD)
+	            return InitError(
+	                    strprintf(_("Error loading %s: You can't disable HD on a already existing HD wallet"),
+	                              walletFile));
+	        if (walletInstance->hdChain.masterKeyID.IsNull() && useHD)
+	            return InitError(
+	                    strprintf(_("Error loading %s: You can't enable HD on a already existing non-HD wallet"),
+	                              walletFile));
+	    }
 
         LogPrintf("%s", strErrors.str());
         LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
@@ -1644,7 +1703,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             uiInterface.InitMessage(_("Rescanning..."));
             LogPrintf("Rescanning last %i blocks (from block %i)...\n", chainActive.Height() - pindexRescan->nHeight, pindexRescan->nHeight);
             nStart = GetTimeMillis();
-            pwalletMain->ScanForWalletTransactions(pindexRescan, true);
+            pwalletMain->ScanForWalletTransactions(pindexRescan, true, fRecoverMnemonic);
             LogPrintf(" rescan      %15dms\n", GetTimeMillis() - nStart);
             pwalletMain->SetBestChain(chainActive.GetLocator());
             nWalletDBUpdated++;

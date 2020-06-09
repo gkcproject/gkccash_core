@@ -14,12 +14,17 @@
 #include "primitives/zerocoin.h"
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Denominations.h"
+#include "wallet/mnemoniccontainer.h"
 
 #include <list>
 #include <stdint.h>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 class CAccount;
 class CAccountingEntry;
@@ -36,6 +41,10 @@ class uint256;
 class CTokenInfo;
 class CTokenTx;
 
+static const uint32_t ORIGINAL_KEYPATH_SIZE = 0x4; // m/0'/0'/<n> is the original keypath
+static const uint32_t BIP44_KEYPATH_SIZE = 0x6;    // m/44'/<1/136>'/0'/<c>/<n> is the BIP44 keypath
+
+
 /** Error statuses for the wallet database */
 enum DBErrors {
     DB_LOAD_OK,
@@ -46,12 +55,63 @@ enum DBErrors {
     DB_NEED_REWRITE
 };
 
+// {value, isHardened}
+typedef pair<uint32_t,bool> Component;
+
+/* simple HD chain data model */
+class CHDChain
+{
+public:
+    uint32_t nExternalChainCounter; // VERSION_BASIC
+    vector<uint32_t> nExternalChainCounters; // VERSION_WITH_BIP44: vector index corresponds to account value
+    CKeyID masterKeyID; //!< master key hash160
+
+    static const int VERSION_BASIC = 1;
+    static const int VERSION_WITH_BIP44 = 10;
+    static const int VERSION_WITH_BIP39 = 11;
+    static const int CURRENT_VERSION = VERSION_WITH_BIP39;
+    static const int N_CHANGES = 5; // standard = 0/1, mint = 2, elysium = 3, elysiumv1 = 4
+    int nVersion;
+
+    CHDChain() { SetNull(); }
+    ADD_SERIALIZE_METHODS;
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
+
+        READWRITE(this->nVersion);
+        nVersion = this->nVersion;
+        READWRITE(nExternalChainCounter);
+        READWRITE(masterKeyID);
+        if (this->nVersion >= VERSION_WITH_BIP44) {
+            READWRITE(nExternalChainCounters);
+            nExternalChainCounters.resize(N_CHANGES);
+        }
+    }
+
+    void SetNull()
+    {
+        nVersion = CHDChain::CURRENT_VERSION;
+        masterKeyID.SetNull();
+        nExternalChainCounter = 0;
+        for(int index=0;index<N_CHANGES;index++){
+            nExternalChainCounters.push_back(0);
+        }
+    }
+};
+
 class CKeyMetadata
 {
 public:
-    static const int CURRENT_VERSION = 1;
+    static const int VERSION_BASIC=1;
+    static const int VERSION_WITH_HDDATA=10;
+    static const int CURRENT_VERSION=VERSION_WITH_HDDATA;
     int nVersion;
     int64_t nCreateTime; // 0 means unknown
+    std::string hdKeypath; //optional HD/bip32 keypath
+    Component nChange; // HD/bip32 keypath change counter
+    Component nChild; // HD/bip32 keypath child counter
+    CKeyID hdMasterKeyID; //id of the HD masterkey used to derive this key
 
     CKeyMetadata()
     {
@@ -63,6 +123,32 @@ public:
         nCreateTime = nCreateTime_;
     }
 
+    bool ParseComponents(){
+        std::vector<std::string> nComponents;
+        if(hdKeypath.empty())
+            return false;
+        if(hdKeypath=="m")
+            return true;
+
+        boost::split(nComponents, hdKeypath, boost::is_any_of("/"), boost::token_compress_on);
+        if(nComponents.size()!=ORIGINAL_KEYPATH_SIZE &&
+           nComponents.size()!=BIP44_KEYPATH_SIZE)
+            return false;
+
+        std::string nChangeStr = nComponents[nComponents.size()-2];
+        std::string nChildStr  = nComponents[nComponents.size()-1];
+
+        nChange.second = (nChangeStr.find("'") != string::npos);
+        boost::erase_all(nChangeStr, "'");
+        nChange.first = boost::lexical_cast<uint32_t>(nChangeStr);
+
+        nChild.second = (nChildStr.find("'") != string::npos);
+        boost::erase_all(nChildStr, "'");
+        nChild.first = boost::lexical_cast<uint32_t>(nChildStr);
+
+        return true;
+    }
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -71,12 +157,21 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
+        if (this->nVersion >= VERSION_WITH_HDDATA)
+        {
+            READWRITE(hdKeypath);
+            READWRITE(hdMasterKeyID);
+        }
     }
 
     void SetNull()
     {
         nVersion = CKeyMetadata::CURRENT_VERSION;
         nCreateTime = 0;
+        hdKeypath.clear();
+        nChild = Component(0, false);
+        nChange = Component(0, false);
+        hdMasterKeyID.SetNull();
     }
 };
 
@@ -181,6 +276,10 @@ public:
     bool WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend);
     bool EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry);
     bool ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial);
+
+    //! write the hdchain model (external chain child index counter)
+    bool WriteHDChain(const CHDChain& chain);
+    bool WriteMnemonic(const MnemonicContainer& mnContainer);
 
 private:
     CWalletDB(const CWalletDB&);

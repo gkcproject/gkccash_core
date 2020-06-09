@@ -24,8 +24,8 @@ Controls_1_4.Tab {
 
 		function gotoEntrustReward()
         {			
-			type_label.currentIndex_ = 20
-			type_label.currentIndexChanged(20)
+			type_label.currentIndex_ = 19
+			type_label.currentIndexChanged(19)
 			type_label.text = qsTr("Bonus Reward")
         }
 
@@ -97,7 +97,7 @@ Controls_1_4.Tab {
                 ListElement { modelData: qsTr("Obfuscation Denominate"); }
                 ListElement { modelData: qsTr("Obfuscation Collateral Payment"); }
                 ListElement { modelData: qsTr("To yourself"); }
-                ListElement { modelData: qsTr("Contract receive"); }
+                //ListElement { modelData: qsTr("Contract receive"); }
                 ListElement { modelData: qsTr("Contract send"); }
                 ListElement { modelData: qsTr("Mined"); }
                 ListElement { modelData: qsTr("Minted"); }

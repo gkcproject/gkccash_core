@@ -85,6 +85,10 @@ ApplicationWindow {
     function tab_change(index)
     {
         body.currentIndex = index
+        if(index==0)
+        {
+        	indexPage.item.init()
+        }
 		if(index==5)
 		{
 			mainnodePage.item.init()
@@ -92,6 +96,10 @@ ApplicationWindow {
 		else if(index==8)
 		{
 			entrustPage.item.init()
+		}
+		else if(index==9)
+		{
+			notificationPage.item.init()
 		}
     }
 
@@ -119,6 +127,12 @@ ApplicationWindow {
 	{		
 		entrustPage.item.init()
 		naviPanel.gotoEntrustpage()
+	}
+
+	function gotoNotificationPage()
+	{		
+		notificationPage.item.init()
+		naviPanel.gotoNotificationPage()
 	}
 
     onClosing:
@@ -250,6 +264,7 @@ ApplicationWindow {
             SmartContractPage{}
             TokenPage{}
 			EntrustPage{id:entrustPage}
+			NotificationPage{id:notificationPage}
 
             currentIndex: 0
         }
