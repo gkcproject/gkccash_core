@@ -1,0 +1,130 @@
+
+Token-RPC Instructions
+
+1 Check the token balance
+./gkc-cli help gettokenbalance
+gettokenbalance <tokenid> <account>
+
+Arguments:
+1. "tokenid"  (string, required)  ERC20 contract address
+2. "account"  (string, required)  token account address, same as gkc address
+
+Result:
+   balance  (int64)
+
+Examples:
+> gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809cf GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wd
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "gettokenbalance", "params": [05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809cf GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wd] }' -H 'content-type: text/plain;' http://127.0.0.1:38803/
+
+Usage example：
+./gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809cf GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wd
+999898780000
+./gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809c  GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wd
+error: {"code":-5,"message":"Invalid tokenid"}
+./gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809cf GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9W
+error: {"code":-5,"message":"Invalid account"}
+./gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809ca GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wd
+error: {"code":-5,"message":"Token not found"}
+./gkc-cli gettokenbalance 05bf1b2d49bf2eeb61c7b1d36a328fbd9c4809cf GUohQVm75Qkp5So9kHtbCQJkvmcpH9X9Wa
+error: {"code":-5,"message":"Invalid account"}
+
+
+2 Token transfer
+./gkc-cli help transfertoken
+transfertoken <tokenid> <from> <to> <amount>
+
+Arguments:
+1. "tokenid"  (string, required)  ERC20 contract address
+2. "from"	 (string, required)  Token account address for sending, this account must be in the current wallet.
+3. "to"	     (string, required)  Token account address for receiving
+4. "amount"   (uint, required)  amount of token to send
+
+Result:
+   txid  (string)
+
+Examples:
+> gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "transfertoken", "params": [9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1] }' -H 'content-type: text/plain;' http://127.0.0.1:38803/
+
+
+Examples:
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1
+61156ef491acc009bc762b5d31c1afd726e370e844012e735dfef9f27ce22e22
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 0
+7bcb0381f285d6e7220f77d4fc384ee92abe542eb4771d0a5c73b877c20a2974
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f424  GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1
+error: {"code":-5,"message":"Invalid tokenid"}
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8  Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1
+error: {"code":-5,"message":"Invalid account"}
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQ  1
+error: {"code":-5,"message":"Invalid account"}
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL -1
+error: {"code":-8,"message":"Invalid amount"}
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4240 GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL 1
+error: {"code":-5,"message":"Token not found"}
+./gkc-cli transfertoken 9e27784a3d83ddc0c51240c4b257dba9b38f4241 GKzQVBbrntTwkwqgMVaXvxwQXvwAdGLVQj GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F 100
+error: {"code":-4,"message":"Token account GKzQVBbrntTwkwqgMVaXvxwQXvwAdGLVQj authorization failed"}
+
+3 Query token transaction records
+./gkc-cli help listtokentransactions
+listtokentransactions <first> <last> (tokenid)
+
+Arguments:
+1. "first"	 (string, required)  The first height of block to query
+2. "last"	 (string, required)  The last height of block to query
+3. "tokenid"  (string, optional)  ERC20 contract address
+
+Result:
+[
+  {
+	 "type": "create",
+	 "block": {
+	   "height": 172400,
+	   "hash": "7ddcbb53c60920c99ea0076f339310cb7fc0ff44af14dd7351d8e5f9b61c4748",
+	   "time": 1592459282
+	 },
+	 "output": {
+	   "txid": "b9376700389f6b9bf4253823145df7d629ab94bcd1a843506455ef9c420f0cfe",
+	   "vout": 1
+	 },
+	 "tokenid": "9e27784a3d83ddc0c51240c4b257dba9b38f4241",
+	 "from": "",
+	 "to": "GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F",
+	 "amount": 1000000000000
+  },
+  {
+	 "type": "transfer",
+	 "block": {
+	   "height": 172418,
+	   "hash": "59252b5a3259bf112ca6599c3c1d36c039a9dfa8d6b8587667f80d00b4d42dd6",
+	   "time": 1592460357
+	 },
+	 "output": {
+	   "txid": "98646bca3f443e3a1a07aadefa83ef4339a5e5c98143723cd63e3cfd42930e26",
+	   "vout": 1
+	 },
+	 "tokenid": "9e27784a3d83ddc0c51240c4b257dba9b38f4241",
+	 "from": "GX5bpe3Z3QCGpQQAKaQpwpv7P4MmVFCD8F",
+	 "to": "Gfes1tLf9KthaWWSXA321Gdinaj8VtYcQL",
+	 "amount": 10000
+  }
+]
+
+
+Examples:
+> gkc-cli listtokentransactions 172400 172420 9e27784a3d83ddc0c51240c4b257dba9b38f4241
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "listtokentransactions", "params": [172400 172420 9e27784a3d83ddc0c51240c4b257dba9b38f4241] }' -H 'content-type: text/plain;' http://127.0.0.1:38803/
+
+
+Note：
+The transaction record of type == "create" indicates the issuance of tokens, the to account indicates the issuer, the amount is the number of issuances, and the unit is the smallest unit.
+
+
+RPC Exception
+
+	return:
+		a json object, example:
+		{
+			"code":-5,
+			"message":"No information available about transaction"
+		}
