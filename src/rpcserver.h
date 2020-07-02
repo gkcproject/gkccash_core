@@ -147,6 +147,7 @@ extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 extern std::string HelpRequiringPassphrase();
 extern std::string HelpExampleCli(std::string methodname, std::string args);
 extern std::string HelpExampleRpc(std::string methodname, std::string args);
+extern std::string HelpExample(std::string methodname, std::string args);
 
 extern void EnsureWalletIsUnlocked();
 
@@ -349,6 +350,8 @@ extern UniValue listentrustrewards(const UniValue& params, bool fHelp);
 extern UniValue getrawblock(const UniValue& params, bool fHelp);
 extern UniValue getaddressdpos(const UniValue& params, bool fHelp);
 extern UniValue getdposnameofblock(const UniValue& params, bool fHelp);
+extern UniValue listblackagents(const UniValue& params, bool fHelp);
+extern UniValue addblackagent(const UniValue& params, bool fHelp);
 #endif
 
 extern UniValue getcrp(const UniValue& params, bool fHelp);

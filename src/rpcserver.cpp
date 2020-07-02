@@ -15,6 +15,7 @@
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
+#include "rpctoken.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
@@ -445,6 +446,9 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "sendextenddata", &sendextenddata, false, false, true},
         {"wallet", "getextenddata", &getextenddata, false, false, true},
         {"wallet", "getmnemoniccode", &getmnemoniccode, false, false, true},
+		{"wallet", "gettokenbalance", &gettokenbalance, false, false, true},
+		{"wallet", "transfertoken", &transfertoken, false, false, true},
+		{"wallet", "listtokentransactions", &listtokentransactions, false, false, true},
         
 #ifdef DPOS
 		{"wallet", "createentrustagent", &createentrustagent, false, false, true},
@@ -462,6 +466,8 @@ static const CRPCCommand vRPCCommands[] =
 		{"wallet", "getrawblock", &getrawblock, false, false, true},
 		{"wallet", "getaddressdpos", &getaddressdpos, false, false, false},
 		{"wallet", "getdposnameofblock", &getdposnameofblock, false, false, false},
+		{"wallet", "listblackagents", &listblackagents, false, false, false},
+		{"wallet", "addblackagent", &addblackagent, false, false, false},
 #endif
 
         {"zerocoin", "getzerocoinbalance", &getzerocoinbalance, false, false, true},
@@ -1074,6 +1080,7 @@ void ServiceConnection(AcceptedConnection* conn)
 
 UniValue CRPCTable::execute(const std::string &strMethod, const UniValue& params) const
 {
+	LogPrintf("execute RPC: method=%s, params=%s\n",strMethod,params.write());
     int64_t clock_begin = GetTimeMicros();
     // Find method
     const CRPCCommand* pcmd = tableRPC[strMethod];
@@ -1163,6 +1170,11 @@ std::string HelpExampleRpc(string methodname, string args)
     return "> curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
            "\"method\": \"" +
            methodname + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:38803/\n";
+}
+
+std::string HelpExample(std::string methodname, std::string args)
+{
+	return HelpExampleCli(methodname,args) + HelpExampleRpc(methodname,args);
 }
 
 const CRPCTable tableRPC;

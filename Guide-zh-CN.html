@@ -1,0 +1,65 @@
+<h1>GKC使用说明</h1>
+
+<ul>
+	<h2>v2.4.1</h2>
+	<h3>赛季奖励黑名单</h3>
+	<p>每一个赛季有一个黑名单，在黑名单中的节点将不会分发本赛季的赛季奖励。</p>
+	<p>使用管理员钱包执行 addblackagent NODE_ID 命令可将特定节点加入黑名单。下一赛季开始后自动取消。例：./gkc-cli addblackagent 123456e4733b68623fd358238316e5bcfc3faf34c68b993af1fc10d9c8123456 </p>
+	<p>所有节点可执行 listblackagents 命令查询当前赛季的黑名单。</p>
+
+	<h2>v2.4.0</h2>
+	<h3>1 钱包升级为HD钱包</h3>
+	<p>本功能兼容老版本钱包：如果数据目录中存在旧版本的钱包文件（默认为wallet.dat），运行新版本程序时不会启用HD钱包功能，老钱包可继续使用。新版本钱包和旧版本钱包可相互转账，不受影响。</p>
+	<h4>用法1：启用HD钱包</h4>
+	<p>删除数据目录中老版本钱包文件，运行程序将创建新的、空的HD钱包。特别提醒：删除前备份钱包文件！</p>
+	<h4>用法2：查看HD钱包的助记词</h4>
+	<p>使用RPC命令 getmnemoniccode 可查看当前钱包的助记词。</p>
+	<h4>用法3：使用助记词恢复HD钱包</h4>
+	<p>删除钱包文件，修改配置文件 gkc.conf 添加 mnemonic 配置项和 keypool 配置项，启动程序后将根据助记词恢复钱包。以下为配置项示例：</p>
+	<p>mnemonic=depth silent benefit stable replace alien ramp exchange dune antique episode man bacon october trophy lucky craft fault vote announce afford brief advance kiss</p>
+	<p>keypool=1000</p>
+	<p>注意：</p>
+	<p>[1] 以上为示例助记词，实际使用时请替换为其他助记词。</p>
+	<p>[2] keypool默认值为1000，用于推导被恢复钱包的地址。可根据旧钱包交易记录数量或UTXO数量做调整。例如权益节点钱包的UTXO比较多，可适当增大keypool值，如5000或更大。</p>
+	<p>[3] keypool值不宜设置过大，keypool值越大恢复速度越慢。</p>
+	<p>[4] mnemonic和keypool配置项仅在恢复钱包时使用，钱包恢复后可以移除。</p>
+
+	<h2>v2.3.5</h2>
+
+	<h3>1 自动备份钱包</h3>
+	<p>程序默认每天备份一次钱包文件，备份文件目录为 gkc/backups/。</p>
+	<p>每次程序启动时备份一次。程序启动后，每隔24小时新增一个备份文件。可修改配置文件，设置定期备份时间间隔以及备份文件数上限。</p>
+	<p>gkc.conf文件中添加以下配置项后重启程序生效:</p>
+	<p><1> createwalletbackups设置备份文件数上限。当备份文件数达到上限时，将删除最老的备份文件，以保存最新的备份</p>
+	<p>createwalletbackups=100000000</p>
+	<p><2> backupwalletinterval设置定期备份时间间隔。单位：分钟</p>
+	<p>backupwalletinterval=1440</p>
+	<p>注：以上配置项是默认值，和不添加配置项的效果相同。根据需要修改参数。</p>
+
+	<h3>2 委托命令添加可选参数指定最小INPUT面值</h3>
+	<p><1> 常规用法依然有效</p>
+	<p><2> 指定INPUT的最小面值</p>
+	<p>以下例子，将选择面值大于或等于10GKC的UTXO作为INPUT，示例</p>
+	<p>gkc-cli entrust ac4bc2a311f4e49256ae1270e2b561995f509eb22b1e3f409d18840cda4469e1 100 10</p>
+	
+	<h3>3 广告功能</h3>
+	<p>新增3个RPC用于发送广告和系统消息。所有用户钱包均可发送广告消息，仅管理员钱包可以发送系统消息。管理员钱包为共识的一部分，不可修改。</p>
+	<p><1> 发送广告 sendadvertise</p>
+	<p>广告费初始为每条 1 GKC，每12个月减半</p>
+	<p>使用示例 ./gkc-cli sendadvertise "Title" "Author" "Text" "Optional link" "Optional extend data"</p>
+	<p><2> 发送系统消息 sendsysmessage</p>
+	<p>使用示例 ./gkc-cli sendsysmessage "System message"</p>
+	<p><3> 过滤广告 filteradtx</p>
+	<p>使用示例 ./gkc-cli filteradtx dbd3e44b93353c88cff5069f167783ab0de4201c9f7c7653a4745a649a3c128e</p>
+	<p>说明：参数为需要过滤的广告交易ID</p>
+
+	<h2>v2.3.0</h2>
+	<h3>1 配置新块收益地址</h3>
+	<p>在gkc.conf文件中添加以下配置项，重启矿工节点后挖出的新块收益将发到该地址上。</p>
+	<p>blockaddress=GYjzuV3DCbvPqf232YhPRUKq7ZywqVTkpq</p>
+	<p>注：该地址是示例地址，请修改为实际需要的收益地址。</p>
+	<h3>2 赛季奖励修改</h3>
+	<p>修改后，赛季奖励将按赛季奖励因子进行分配。</p>
+	<p>赛季奖励因子计算方式：累计当前赛季所有高度的有效委托量。</p>
+</ul>
+

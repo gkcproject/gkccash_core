@@ -52,7 +52,7 @@ bool CMasternodeSync::IsBlockchainSynced()
     if (pindex == NULL) return false;
 
 #ifdef DPOS
-	
+	//Allow no block for a long time	
 #else
     if (pindex->nTime + 60 * 60 < GetTime())
         return false;

@@ -44,11 +44,12 @@
 #include <boost/thread.hpp>
 
 #ifdef DPOS
-#include "entrustment.h"
-#include "crp/CoinReleasePlan.h"
+#include "entrustment.h" // dpos
 #endif
-
-#include "scriptex.h"
+#include "crp/CoinReleasePlan.h" // crp
+#include "crp/FundReward.h" // fundreward
+#include "scriptex.h" // scriptex
+#include "season_reward.h" // seasonreward
 
 using namespace boost;
 using namespace std;
@@ -1569,6 +1570,11 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
 			}
         }
         ///////////////////////////////////////////////////////////
+		else if(scriptex::IsBlackAgent(txout.scriptPubKey))
+		{
+			if(!seasonreward::VerifyAddBlackAgentTx(tx.vin,txout.scriptPubKey))
+				return state.DoS(100, error("CheckTransaction() : business fee of AD too low"),REJECT_INVALID, "bad-ad-fee");
+		}
 
         if (fZerocoinActive && txout.IsZerocoinMint()) {
             if(!CheckZerocoinMint(tx.GetHash(), txout, state, false))
@@ -2725,7 +2731,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
 
             // If prev is coinbase, check that it's matured
             if (coins->IsCoinBase() || coins->IsCoinStake()) {
-                if (nSpendHeight - coins->nHeight < Params().COINBASE_MATURITY())
+                if (nSpendHeight - coins->nHeight < Params().COINBASE_MATURITY(nSpendHeight))
                     return state.Invalid(
                                 error("CheckInputs() : tried to spend coinbase at depth %d, coinstake=%d", nSpendHeight - coins->nHeight, coins->IsCoinStake()),
                                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase");
@@ -4747,8 +4753,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
 #ifdef DPOS
 		if(!dpos::CheckCoinStake(block))
-            return state.DoS(100, error("CheckBlock() : entrust reward in coinstake check failed"));
+            return state.DoS(100, error("CheckBlock() : entrust reward or season reward in coinstake check failed"));
 #endif
+
+		if(!fundreward::CheckBlock(block))
+            return state.DoS(100, error("CheckBlock() : fund reward check failed"));
 		
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
@@ -5150,7 +5159,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
             return error("AcceptBlock() : ReceivedBlockTransactions failed");
 
-		if(!dpos::WriteDposMetaBlock(block))
+		if(!dpos::WriteDposMetaBlock(block,Entrustment::GetInstance().GetMetaBlockVersion(nHeight)))
 			LogPrint("dpos","AcceptBlock | warning | dpos::WriteDposMetaBlock(block=%s) failed\n",block.GetHash().ToString());
 
     } catch (std::runtime_error& e) {
@@ -7847,8 +7856,8 @@ CAmount advertisement::GetAdPrice(BlockHeight h)
 	if(h >= Params().forkheight_modifyAdPrice){
 		price = 10*COIN;
 	}
-	BlockHeight start = crp::CoinReleasePlan::GetInstance().pos.heightRange.Begin();
-	BlockHeight interval = 12*crp::CoinReleasePlan::GetInstance().pos.BlockNumPerMonth();
+	BlockHeight start = crp::CoinReleasePlan::GetInstance().GetPosPlan(h).heightRange.Begin();
+	BlockHeight interval = 12*crp::CoinReleasePlan::GetInstance().GetPosPlan(h).BlockNumPerMonth();
 	return halve(price,start,interval,h);
 }
 

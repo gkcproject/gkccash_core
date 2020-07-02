@@ -34,6 +34,10 @@ RAW_TEST_FILES = test/data/alertTests.raw
 GENERATED_TEST_FILES = $(JSON_TEST_FILES:.json=.json.h) $(RAW_TEST_FILES:.raw=.raw.h)
 
 BITCOIN_TESTS =\
+  test/rpctoken_tests.cpp \
+  test/crp_tests.cpp \
+  test/scriptex_tests.cpp \
+  test/entrustment_impl_tests.cpp \
   test/contract_call_script_tests.cpp \
   test/bip39_tests.cpp \
   test/entrust_reward_tests.cpp \

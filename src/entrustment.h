@@ -25,6 +25,29 @@ class CTxOut;
 
 namespace dpos
 {
+	class Blacklist
+	{
+	private:
+		std::set<AgentID> agentidSet;
+	public:
+		void Add(const AgentID& a) {
+			agentidSet.insert(a);
+		}
+		bool Remove(const AgentID& a) {
+			return agentidSet.erase(a) > 0;
+		}
+		bool Exist(const AgentID& a) const {
+			return agentidSet.count(a) > 0;
+		}
+		void ListAgents(std::vector<AgentID>& v) const {
+			for( const auto& a : agentidSet)
+				v.push_back(a);
+		};
+		void Clear() {
+			agentidSet.clear();
+		}
+	};
+
 	typedef BlockHeight BlockAmount;
 	typedef CAmount CoinAmount;
 	
@@ -154,6 +177,11 @@ public:
 	BlockHeight forkheight_halfMinEntrustAmount;
 	BlockHeight forkheight_halfCreateAgentAmount;
 	BlockHeight forkheight_halfMinDivideReward;
+	BlockHeight forkheight_seasonRewardTop150;
+	BlockHeight forkheight_blackAgentList;
+
+	int GetMetaBlockVersion(BlockHeight) const;
+	bool BlackAgentListAvailable(BlockHeight) const;
 
 	CAmount GetMinDivideReward(BlockHeight) const;
 	CAmount GetMinDivideRewardV1() const;
@@ -207,12 +235,14 @@ public:
 	static std::string GetBackupFileName(BlockHeight);
 	void StartNewMonth(BlockHeight);
 
-	vector<Agent*> GetAgentsRank(BlockHeight height, int top_count, const SortRule&);
+	vector<Agent*> GetAgentsRank(BlockHeight height, const SortRule&);
 
 	void Lock();
 	void Unlock();
 
 	bool IsActiveUser(const dpos::UserStatistics&, BlockHeight height) const;
+
+	dpos::Blacklist GetSeasonRewardBlacklist(BlockHeight) const;
 
 protected:
 	bool AddAgentTx(BlockHeight, CTransaction&);
@@ -244,6 +274,7 @@ private:
 	BlockHeight baseHeightOffset;
 
 	AgentMapMap agentMaps; //At each height, all dpos-node information at the height is stored in agentMaps
+	std::map<BlockHeight,dpos::Blacklist> blackListStatus;
 
 	
 	CCriticalSection cs_heights;
@@ -347,10 +378,16 @@ namespace dpos
 		vector<Resign>  resign_list;
 		vector<Entrust> entrust_list;
 		vector<Reward>	reward_list;
+		vector<AgentID> blackagent_list;
+
+		static int blackAgentListVersion;
 	
 		ADD_SERIALIZE_METHODS;
 		template <typename Stream, typename Operation>
 		inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+			if(nVersion >= blackAgentListVersion)
+				READWRITE(nVersion);
+			
 			READWRITE(blockhash);
 			READWRITE(agentid);
 			READWRITE(time);
@@ -358,6 +395,9 @@ namespace dpos
 			READWRITE(resign_list);
 			READWRITE(entrust_list);
 			READWRITE(reward_list);
+
+			if(nVersion >= blackAgentListVersion)
+				READWRITE(blackagent_list);
 		}
 
 		UniValue ToUniValue() const;
@@ -373,8 +413,8 @@ namespace dpos
 		static DposMetaBlockIO& GetInstance();
 
 		bool LoadLastBlockPos();
-		bool Write(const DposMetaBlock&);
-		bool Read(CDiskBlockPos, DposMetaBlock&);
+		bool Write(const DposMetaBlock&, int version);
+		bool Read(CDiskBlockPos, DposMetaBlock&, int version);
 
 		/** Open a dpos meta block file (dps?????.dat) */
 		FILE* OpenDposMetaBlockFile(const CDiskBlockPos& pos, bool fReadOnly = false);
@@ -404,7 +444,7 @@ namespace dpos
 		CCriticalSection cs_db;
 	};
 
-	bool WriteDposMetaBlock(const CBlock&);
+	bool WriteDposMetaBlock(const CBlock&, int version);
 }
 
 #endif // ~DPOS

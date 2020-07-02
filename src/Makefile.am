@@ -162,6 +162,7 @@ BITCOIN_CORE_H = \
   rpcclient.h \
   rpcprotocol.h \
   rpcserver.h \
+  rpctoken.h \
   script/interpreter.h \
   script/script.h \
   script/sigcache.h \
@@ -207,8 +208,10 @@ BITCOIN_CORE_H = \
   contract_api/gkctransaction.h \
   contract_api/storageresults.h \
   entrustment.h \
+  entrustment_impl.h \
   crp/CoinReleasePlan.h \
   scriptex.h \
+  season_reward.h \
   support/allocators/secure.h \
   compat/sanity.h
 
@@ -256,6 +259,7 @@ libbitcoin_server_a_SOURCES = \
   contract_api/gkcstate.cpp \
   contract_api/storageresults.cpp \
   entrustment.cpp \
+  entrustment_impl.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
@@ -292,6 +296,9 @@ libbitcoin_wallet_a_SOURCES = \
   rpcdump.cpp \
   primitives/zerocoin.cpp \
   rpcwallet.cpp \
+  rpctoken.cpp \
+  rpctoken_impl.h \
+  rpctoken_impl.cpp \
   kernel.cpp \
   wallet.cpp \
   wallet_ismine.cpp \
@@ -521,7 +528,10 @@ libbitcoin_common_a_SOURCES = \
   contract/utils/json_spirit/json_spirit_writer.h \
   contract/utils/json_spirit/json_spirit_writer_template.h \
   crp/CoinReleasePlan.cpp \
+  crp/FundReward.h \
+  crp/FundReward.cpp \
   scriptex.cpp \
+  season_reward.cpp \
   sensitivewords.h \
   sensitivewords.cpp \
   sensitivewords_words.cpp \

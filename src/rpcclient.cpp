@@ -118,6 +118,11 @@ static const CRPCConvertParam vRPCConvertParams[] =
 		{"listadfilter", 0},
 		{"listadfilter", 1},
 
+		// Token: ERC20 contract
+		{"transfertoken", 3},	
+		{"listtokentransactions", 0},	
+		{"listtokentransactions", 1},	
+
         //////////////////////////////gkc-vm
         {"createcontract", 1},
         {"createcontract", 2},

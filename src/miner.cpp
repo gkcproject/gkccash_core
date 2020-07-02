@@ -24,6 +24,7 @@
 #include "masternode-payments.h"
 #include "accumulators.h"
 #include "spork.h"
+#include "crp/FundReward.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -1200,8 +1201,9 @@ void FillPosBlockPayee(BlockHeight blockheight, BLOCK_VERSION blockVersion, CAmo
 	2: stake miner reward
 	3: stake miner reward-split (optional)
 	4: masternode reward
-	5+: entrust rewards (variable)
-	6+: top-agent rewards (variable)
+	5: fund reward (optional)
+	6+: entrust rewards (variable)
+	7+: top-agent rewards (variable)
 	*/
 
 	crp::BlockValue bv = crp::GetBlockValue(blockheight);
@@ -1210,9 +1212,18 @@ void FillPosBlockPayee(BlockHeight blockheight, BLOCK_VERSION blockVersion, CAmo
 	
 	masternodePayments.AppendPosBlockPayee(blockheight,bv.masternode,vout);
 
+	LogPrint("fundreward","::%s|INFO|blockheight=%d, bv.fund=%lld\n",__func__,blockheight,bv.fund);
+	if(bv.fund > 0)
+	{
+		CBitcoinAddress fundRewardAddr = fundreward::GetFundRewardAddress(blockheight);
+		if(!fundRewardAddr.IsGKC())
+			LogPrintf("%s|ERROR: fundRewardAddr(%s) is invalid gkc address.\n",__func__,fundRewardAddr.ToString());
+		fundreward::AppendFundReward(fundRewardAddr,bv.fund,vout);
+	}
+	
 	std::map<CBitcoinAddress,CAmount> monthlyRewardMap = Entrustment::GetInstance().GetMonthlyRewardMap(blockheight);
 	dpos::AppendMonthlyReward(monthlyRewardMap,vout);
-	
+
 	const BlockHeight baseheight = Entrustment::GetInstance().GetBaseHeight(blockheight);
 	if(baseheight >= crp::GetPosStartHeight()){
 		std::map<CBitcoinAddress,CAmount> entrustDivideMap = Entrustment::GetInstance().GetExpectDivideRewardMap(blockheight,Entrustment::GetInstance().GetMyAgentID());

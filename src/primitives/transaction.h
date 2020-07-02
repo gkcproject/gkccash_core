@@ -137,6 +137,7 @@ public:
 		CREATE_AGENT, 
 		MONTHLY_REWARD,
 		GAS_REFUND,
+		FUND_REWARD,
 	};
 	Type type;
 

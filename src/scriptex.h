@@ -9,12 +9,22 @@
 #include "base58.h"
 #include "keystore.h"
 
+namespace scriptex
+{
+	typedef std::vector<unsigned char> bytes_t;
+	
+	CScript EncodeBlackAgentToScript(const AgentID&);
+	void DecodeBlackAgentFromScript(const CScript&, AgentID&, bytes_t& signature);
+	bool IsBlackAgent(const CScript&);
+}
+
 namespace op_return_type
 {
 	extern const uint32_t ADVERTISE;
 	extern const uint32_t SYSTEM;
 	extern const uint32_t ADFILTER;
 	extern const uint32_t COMMENT;
+	extern const uint32_t BLACKAGENT;
 }
 
 class ScriptEx

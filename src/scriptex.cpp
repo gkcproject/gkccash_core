@@ -16,6 +16,7 @@ const uint32_t op_return_type::ADVERTISE = 0x41445645;
 const uint32_t op_return_type::SYSTEM    = 0x53595354;	
 const uint32_t op_return_type::ADFILTER  = 0x41444649;	
 const uint32_t op_return_type::COMMENT   = 0x434f4d4d;	
+const uint32_t op_return_type::BLACKAGENT = 0x424c4143; 
 
 static void _encode_header(uint32_t typeLabel, uint16_t version, std::vector<unsigned char>& header)
 {
@@ -403,4 +404,39 @@ bool advertisement::FilterAd(const Advertise& ad)
 	return advertisement::SensitiveWordsLib::GetInstance().Match(ad.text);
 }
 
+CScript scriptex::EncodeBlackAgentToScript(const AgentID& agentid)
+{
+	CScript script;
+	bytes_t header;
+	_encode_header(op_return_type::BLACKAGENT, 1, header);
+	script << OP_RETURN
+		<< header
+		<< ToByteVector(agentid);
+	return script;
+}
+
+bool scriptex::IsBlackAgent(const CScript& script)
+{
+	return _check_type(script.data(),script.size()) == op_return_type::BLACKAGENT;
+}
+
+void scriptex::DecodeBlackAgentFromScript(const CScript& script, AgentID& agentid, bytes_t& sig)
+{
+	vector<valtype> dataVec;
+	if(GetScriptDataVec(script,dataVec))
+	{
+		size_t size = dataVec.size();
+		if(size >= 2)
+		{
+			OpReturnMessage msg;
+			_decode_header(dataVec[0],msg.type,msg.version);
+		
+			valtype vch = dataVec[1];
+			agentid = AgentID(vch);
+		
+			if(size >= 3)
+				sig = dataVec[2];
+		}
+	}	
+}
 

@@ -1,4 +1,4 @@
-<h1>GKC Release Version 2.4.0</h1>
+<h1>GKC Release Version 2.5.1</h1>
 
 <h4>You are now using release version of GKC. There are several missing functions and bugs already known. If you found any new bugs，or you have any advice, feel free to contact us. Please DO NOT discuss in public. Thanks！</h4>
 
@@ -11,6 +11,16 @@
 <h1>Change Log</h1>
 
 <ul>
+	<h5> v2.5.1 </h5>
+	<li>1 Fork: Increase the number of bonus points for the season rewards</li>
+	<li>2 Fork: Add season reward blacklist</li>
+	<li>3 Fork: Increase Coinbase transaction maturity</li>
+	<li>4 Fix available balance calculation error</li>
+	<li>5 Fork: fix redemption transaction lock issue</li>
+	<li>6 Fix the problem that the statistics of the Last Season Reward data in the node is incorrect</li>
+	<li>7 Add Token RPC to support balance query, transfer and transfer record query of known Token</li>
+	<li>8 Add foundation rewards</li>
+
 	<h5> v2.4.0 </h5>
 	<li>1 Fix the problem that the block browser displays inaccurate number of DPOS users</li>
 	<li>2 Fork (207282): Fix the problem of destroying the remaining small unissued coins after the entrusted user redeems and pays dividends</li>

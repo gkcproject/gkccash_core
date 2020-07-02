@@ -4658,7 +4658,7 @@ UniValue getcurrentseason(const UniValue& params, bool fHelp)
 	if(fHelp || params.size() > 0)
 		throw runtime_error(
 			"getcurrentseason\n"
-			"\nGet top 99 agent nodes in current season.\n");
+			"\nGet top agent nodes in current season.\n");
 
 	UniValue result(UniValue::VOBJ);
 
@@ -4677,7 +4677,7 @@ UniValue getcurrentseason(const UniValue& params, bool fHelp)
 	else
 		sort_rule = &descByEntrustAmount;
 	assert(sort_rule);
-	std::vector<Agent*> node_vec = Entrustment::GetInstance().GetAgentsRank(current_height,99,*sort_rule);
+	std::vector<Agent*> node_vec = Entrustment::GetInstance().GetAgentsRank(current_height,*sort_rule);
 	UniValue node_arry(UniValue::VARR);
 	const size_t size = node_vec.size();
 	for(int i=0; i<size; i++){
@@ -4851,15 +4851,16 @@ UniValue getcrp(const UniValue& params, bool fHelp)
 	powObj.push_back(Pair("stableBlockReward",plan.pow.stableBlockReward));
 	result.push_back(Pair("pow",powObj));
 
-	posObj.push_back(Pair("velocity",plan.pos.velocity));
-	posObj.push_back(Pair("begin-height",plan.pos.heightRange.Begin()));
-	posObj.push_back(Pair("back-height",plan.pos.heightRange.Back()));
-	posObj.push_back(Pair("standardMinerReward",plan.pos.standardMinerReward));
-	posObj.push_back(Pair("standardEntrustReward",plan.pos.standardEntrustReward));
-	posObj.push_back(Pair("standardMasternodeReward",plan.pos.standardMasternodeReward));
-	posObj.push_back(Pair("monthlyTopFirst",plan.pos.monthlyTopFirst));
-	posObj.push_back(Pair("monthlyTopSecond",plan.pos.monthlyTopSecond));
-	posObj.push_back(Pair("month",plan.pos.month));
+	const crp::PosPlan& posplan = plan.GetPosPlan(chainActive.Height());
+	posObj.push_back(Pair("velocity",posplan.velocity));
+	posObj.push_back(Pair("begin-height",posplan.heightRange.Begin()));
+	posObj.push_back(Pair("back-height",posplan.heightRange.Back()));
+	posObj.push_back(Pair("standardMinerReward",posplan.standardMinerReward));
+	posObj.push_back(Pair("standardFundReward",posplan.standardFundReward));
+	posObj.push_back(Pair("standardEntrustReward",posplan.standardEntrustReward));
+	posObj.push_back(Pair("standardMasternodeReward",posplan.standardMasternodeReward));
+	posObj.push_back(Pair("monthlyTopFirst",posplan.monthlyTopFirst));
+	posObj.push_back(Pair("monthlyTopSecond",posplan.monthlyTopSecond));
 	result.push_back(Pair("pos",posObj));
 
 	otherObj.push_back(Pair("zero-height",Params().Zerocoin_StartHeight()));
@@ -5097,6 +5098,52 @@ UniValue getmnemoniccode(const UniValue& params, bool fHelp)
             result = mnemonic.c_str();
     }
 	return result;
+}
+
+UniValue listblackagents(const UniValue& params, bool fHelp)
+{
+	if(fHelp)
+        throw runtime_error("listblackagents");
+		
+	dpos::Blacklist blist = Entrustment::GetInstance().GetSeasonRewardBlacklist(chainActive.Height());
+	std::vector<AgentID> agentlist;
+	blist.ListAgents(agentlist);
+	UniValue result(UniValue::VARR);
+	for(const auto& id : agentlist)
+		result.push_back(id.ToString());
+	return result;
+}
+
+UniValue addblackagent(const UniValue& params, bool fHelp)
+{
+	if(fHelp || params.size() < 1)
+        throw runtime_error("addblackagent <agentid>");
+
+	try
+	{
+		if(!Entrustment::GetInstance().BlackAgentListAvailable(chainActive.Height()))
+			throw std::runtime_error("Feature not available");
+
+		AgentID agentid;
+		agentid.SetHex(params[0].get_str());
+
+		if(!Entrustment::GetInstance().IsAgentIdValid(agentid))
+			throw std::runtime_error("Agent not found");
+
+		if(!pwalletMain)
+			throw std::runtime_error("invalid wallet");
+		CWalletTx tx = pwalletMain->CreateAddBlackAgentTx(agentid);
+		
+		CReserveKey reservekey(pwalletMain);
+		if(!pwalletMain->CommitTransaction(tx,reservekey,"tx"))
+			throw std::runtime_error("CommitTransaction() failed");
+		
+		return tx.GetHash().ToString();
+	}
+	catch(std::exception& e)
+	{
+		throw JSONRPCError(RPC_WALLET_ERROR, e.what());
+	}
 }
 
 #endif

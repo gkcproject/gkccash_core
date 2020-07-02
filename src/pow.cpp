@@ -37,7 +37,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     if (crp::IsPosHeight(nextHeight)) {
         const bool fTimeV2 = Params().IsTimeProtocolV2(nextHeight);
         const uint256 bnTargetLimit = Params().ProofOfStakeLimit(fTimeV2);
-        int64_t nTargetSpacing = crp::CoinReleasePlan::GetInstance().pos.velocity;
+        int64_t nTargetSpacing = crp::CoinReleasePlan::GetInstance().GetPosPlan(nextHeight).velocity;
 		const int I = (fTimeV2 ? 30 : 2);
         int64_t nTargetTimespan = nTargetSpacing * I;
 

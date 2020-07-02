@@ -168,6 +168,7 @@ CTxOut::Typename CTxOut::GetTypename(CTxOut::Type type){
 		case Type::CREATE_AGENT:   return createAgentTypename;
 		case Type::MONTHLY_REWARD:   return "MonthlyReward";
 		case Type::GAS_REFUND:     return "GasRefund";
+		case Type::FUND_REWARD:    return "FundReward";
 	}
 	assert(0);
 	throw std::logic_error("Undefined txout type");

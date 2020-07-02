@@ -5,6 +5,7 @@
 #include <limits>
 #include "uint256.h"
 #include "main.h"
+#include "forkheights.h" // forkheight_release_v_2_4_1
 
 using namespace std;
 using namespace crp;
@@ -20,6 +21,7 @@ const time_t crp::MONTH = 31*DAY;
 
 BlockValue::BlockValue(){
 	miner = 0;
+	fund = 0;
 	entrust = 0;
 	masternode = 0;
 	topFirst = 0;
@@ -27,23 +29,31 @@ BlockValue::BlockValue(){
 }
 HeightRange::HeightRange(){
 	begin = 0;
-	range = 0;
+	range = InfiniteHeight();
 }
 Height HeightRange::Begin() const{
 	return begin;
 }
-Height HeightRange::Range() const{
-	return range;
-}
 Height HeightRange::Back() const{
+	if(End() == InfiniteHeight())
+		return InfiniteHeight();
 	return End() - 1;
 }
 Height HeightRange::End() const{
-	return Begin() + Range();
+	if(range == InfiniteHeight())
+		return InfiniteHeight();
+	return begin + range;
 }
 bool HeightRange::Exists(Height h) const{
+	if(range == InfiniteHeight())
+		return h >= Begin();
+	assert(Back() != InfiniteHeight());
 	return Begin() <= h && h <= Back();
 }
+Height HeightRange::InfiniteHeight(){
+	return std::numeric_limits<Height>::max();
+}
+
 crp::Agent::Agent(){
 	id = 0;
 	blockAmount = 0;
@@ -58,33 +68,39 @@ CoinReleasePlan::CoinReleasePlan(){
   	pow.heightRange.begin      = 1;
   	pow.heightRange.range      = 1 + pow.stableBlockNum;
 
-	pos.velocity                 = 1*MINUTE;
-	pos.standardMinerReward      = 120000000;
-	pos.standardEntrustReward    = 660000000;
-	pos.standardMasternodeReward =  60000000;
-	pos.monthlyTopFirst          = 78000*COIN;
-	pos.monthlyTopSecond         = 78000*COIN;
-	pos.month                    = 30;
-	pos.heightRange.begin        = pow.heightRange.End();
-	pos.heightRange.range        = pos.month * pos.BlockNumPerMonth();
-	pos.boobyPrize               = 10 * COIN; //a prize that is given to the person who is not generates POS block in a monthly competition
+	pos_v1.velocity                 = 1*MINUTE;
+	pos_v1.standardMinerReward      =   1.2 * COIN;
+	pos_v1.standardFundReward       =   0;
+	pos_v1.standardEntrustReward    =   6.6 * COIN;
+	pos_v1.standardMasternodeReward =   0.6 * COIN;
+	pos_v1.monthlyTopFirst          = 78000 * COIN;
+	pos_v1.monthlyTopSecond         = 78000 * COIN;
+	pos_v1.heightRange.begin        = pow.heightRange.End();
+	pos_v1.heightRange.range        = HeightRange::InfiniteHeight();
+	pos_v1.boobyPrize               = 10 * COIN; //a prize that is given to the person who is not generates POS block in a monthly competition
 
+	pos_v2 = pos_v1;
+	pos_v2.standardFundReward       =  0.35 * COIN;
+	pos_v2.standardMasternodeReward =  0.48 * COIN;
+	pos_v2.monthlyTopFirst          = 72800 * COIN;
+	pos_v2.monthlyTopSecond         = 72800 * COIN;
+	
 	forkHeightForSeasonRewardV2  = 92281; // second reward height of season
+	seasonIntervalHeight         = pos_v1.BlockNumPerMonth();
+	forkheight_seasonIntervalHeight = std::numeric_limits<Height>::max(); // never fork
+	forkheight_posV2 = forkheight_release_v_2_4_1;
 }
+
+Height crp::CoinReleasePlan::GetSeasonIntervalHeight(Height chainHeight) const
+{
+	Height result = GetPosPlan(chainHeight).BlockNumPerMonth();
+	if(chainHeight >= forkheight_seasonIntervalHeight)
+		result = seasonIntervalHeight;
+	return result;
+}
+
 BlockAmount Plan::BlockNumPerMonth() const{
 	return MONTH / velocity;
-}
-
-HeightRange PosPlan::GetSeasonHeightRange(Height blockheight) const
-{
-	Height start0,range,x;
-	HeightRange result;
-	start0 = heightRange.Begin();
-	range = BlockNumPerMonth();
-	x = blockheight;
-	result.begin = GetStartOfRange(start0,range,x);
-	result.range = range;
-	return result;
 }
 
 BlockValue CoinReleasePlan::GetBlockValue(Height h) const{
@@ -96,20 +112,30 @@ BlockValue CoinReleasePlan::GetBlockValue(Height h) const{
 		v.miner = pow.stableBlockReward;
 	}
 	else if(InPosHeightRange(h)){
-		Height start = pos.heightRange.Begin();
-		Height interval = 12*pos.BlockNumPerMonth();
-		v.miner = halve(pos.standardMinerReward,start,interval,h);
-		v.entrust = halve(pos.standardEntrustReward,start,interval,h);
-		v.masternode = halve(pos.standardMasternodeReward,start,interval,h);
+		const PosPlan& posplan = GetPosPlan(h);
+		Height start = posplan.heightRange.Begin();
+		Height interval = 12*posplan.BlockNumPerMonth();
+		v.miner = halve(posplan.standardMinerReward,start,interval,h);
+		v.fund = halve(posplan.standardFundReward,start,interval,h);
+		v.entrust = halve(posplan.standardEntrustReward,start,interval,h);
+		v.masternode = halve(posplan.standardMasternodeReward,start,interval,h);
 		if(IsSeasonRewardHeight(h)){
-			v.topFirst = halve(pos.monthlyTopFirst,start,interval,h);
-			v.topSecond = halve(pos.monthlyTopSecond,start,interval,h);
+			v.topFirst = halve(posplan.monthlyTopFirst,start,interval,h);
+			v.topSecond = halve(posplan.monthlyTopSecond,start,interval,h);
 		}
 	}
 	else{
 		//undefined
 	}
 	return v;
+}
+const PosPlan& CoinReleasePlan::GetPosPlan(Height h) const{
+	if(IsPosV2(h))
+		return pos_v2;
+	return pos_v1;
+}
+bool CoinReleasePlan::IsPosV2(Height h) const{
+	return h >= forkheight_posV2;
 }
 bool CoinReleasePlan::IsSeasonRewardV2(Height h) const {
 	return h >= forkHeightForSeasonRewardV2;
@@ -121,11 +147,11 @@ bool CoinReleasePlan::InPowHeightRange(Height h) const{
 	return pow.heightRange.Exists(h);
 }
 bool CoinReleasePlan::InPosHeightRange(Height h) const{
-	return pos.heightRange.Exists(h);
+	return GetPosPlan(h).heightRange.Exists(h);
 }
 bool CoinReleasePlan::IsSeasonRewardHeight(Height h) const{
-	const Height first = pos.heightRange.Begin();
-	const BlockAmount range = pos.BlockNumPerMonth();
+	const Height first = GetPosPlan(h).heightRange.Begin();
+	const BlockAmount range = GetSeasonIntervalHeight(h);
 	const Height fork = first + range;
 
 	if(h < first)
@@ -142,8 +168,8 @@ bool CoinReleasePlan::IsSeasonRewardHeight(Height h) const{
 }
 Season CoinReleasePlan::GetSeason(Height h) const{
 	Season season;
-	const Height first = pos.heightRange.Begin();
-	const BlockAmount range = pos.BlockNumPerMonth();
+	const Height first = GetPosPlan(h).heightRange.Begin();
+	const BlockAmount range = GetSeasonIntervalHeight(h);
 	const Height season_offset = h - first;
 	season.id = int(season_offset/range);
 	season.first_height = first + season.id * range;
@@ -154,21 +180,17 @@ Season CoinReleasePlan::GetSeason(Height h) const{
 	assert(IsSeasonRewardHeight(season.reward_height));
 	return season;
 }
-bool CoinReleasePlan::IsFirstHeightOfSeason(Height h) const{
-	const Height first = pos.heightRange.Begin();
-	const BlockAmount range = pos.BlockNumPerMonth();
-	return (h >= first) && ((h - first) % range == 0);
+
+int crp::DistributeRule::TotalCount() const
+{
+	return topFirstCount + topSecondCount;
 }
-bool CoinReleasePlan::IsLastHeightOfSeason(Height h) const{
-	const Height first = pos.heightRange.Begin();
-	const BlockAmount range = pos.BlockNumPerMonth();
-	const Height last = first + range - 1;
-	return (h >= last) && ((h - last) % range == 0);
-}
+
 std::string BlockValue::ToString() const{
 	std::ostringstream os;
 	os << "{"
 		<< "\"miner\":" << miner << ","
+		<< "\"fund\":" << fund << ","
 		<< "\"entrust\":" << entrust << ","
 		<< "\"masternode\":" << masternode << ","
 		<< "\"topFirst\":" << topFirst << ","
@@ -178,10 +200,11 @@ std::string BlockValue::ToString() const{
 	return os.str();
 }
 CoinAmount BlockValue::Total() const{
-	return miner + entrust + masternode + topFirst + topSecond;
+	return miner + fund + entrust + masternode + topFirst + topSecond;
 }
 bool crp::operator== (const BlockValue& left, const BlockValue& right){
 	return left.miner == right.miner
+		&& left.fund == right.fund
 		&& left.entrust == right.entrust
 		&& left.masternode == right.masternode
 		&& left.topFirst == right.topFirst
@@ -191,14 +214,14 @@ bool crp::operator== (const BlockValue& left, const BlockValue& right){
 bool crp::operator!= (const BlockValue& left, const BlockValue& right) {
 	return !(left==right);
 }
-std::vector<std::pair<Agentid,CoinAmount>> crp::GetMonthlyDistribution(const std::vector<Agent>& agentVec, CoinAmount topFirstTotalAmount, CoinAmount topSecondTotalAmount){
+std::vector<std::pair<Agentid,CoinAmount>> crp::GetMonthlyDistribution(const std::vector<Agent>& agentVec, CoinAmount topFirstTotalAmount, CoinAmount topSecondTotalAmount, const DistributeRule& rule, CoinAmount boobyPrize){
 	std::vector<std::pair<Agentid,CoinAmount>> distVec;
 	const int N = agentVec.size();
 	if(N==0)
 		return distVec;
 	
-	const int MinN1 = 1, MaxN1 = 27;
-	const int MinN2 = 0, MaxN2 = 99 - MaxN1;
+	const int MinN1 = 1, MaxN1 = rule.topFirstCount;
+	const int MinN2 = 0, MaxN2 = rule.topSecondCount;
 	const int N1 = min(N,MaxN1);
 	const int N2 = min(max(MinN2,N-MaxN1),MaxN2);
 	assert(MinN1 <= N1 && N1 <= MaxN1);
@@ -209,7 +232,7 @@ std::vector<std::pair<Agentid,CoinAmount>> crp::GetMonthlyDistribution(const std
 		topSecondTotalAmount = 0;
 	}
 
-	// TOP1-27
+	// TOP First: [1,topFirstCount]
 	const CoinAmount topFirstAverage = topFirstTotalAmount/N1;
 	const CoinAmount topFirstRemainder = topFirstTotalAmount%N1;
 	for(int i=0; i<N1; i++){
@@ -218,7 +241,7 @@ std::vector<std::pair<Agentid,CoinAmount>> crp::GetMonthlyDistribution(const std
 		distVec.push_back(make_pair(id,reward));
 	}
 
-	// TOP28-99
+	// TOP Second: [topFirstCount+1,topFirstCount+topSecondCount]
 	WeightNumber totalN2Weight = 0;
 	for(int i=0; i<N2; i++){
 		const Agent& agent = agentVec[N1+i];
@@ -229,8 +252,8 @@ std::vector<std::pair<Agentid,CoinAmount>> crp::GetMonthlyDistribution(const std
 	for(int i=0; i<N2; i++){
 		int countIndex = N1+i;
 		const Agent& agent = agentVec[countIndex];
-		if(agent.weight == 0 && topSecondTotalAmountRemain >= CoinReleasePlan::GetInstance().pos.boobyPrize){
-			CoinAmount reward = CoinReleasePlan::GetInstance().pos.boobyPrize;
+		if(agent.weight == 0 && topSecondTotalAmountRemain >= boobyPrize){
+			CoinAmount reward = boobyPrize;
 			distVec.push_back(make_pair(agent.id,reward));
 			topSecondRewardTotal += reward;
 			topSecondTotalAmountRemain -= reward;
@@ -273,7 +296,7 @@ bool crp::IsPowHeight(Height h){
 }
 
 bool crp::IsPosHeight(Height h){
-	return crp::CoinReleasePlan::GetInstance().pos.heightRange.Exists(h);
+	return crp::CoinReleasePlan::GetInstance().GetPosPlan(h).heightRange.Exists(h);
 }
 
 BlockValue crp::GetBlockValue(Height h){
@@ -281,7 +304,7 @@ BlockValue crp::GetBlockValue(Height h){
 }
 
 Height crp::GetPosStartHeight(){
-	return crp::CoinReleasePlan::GetInstance().pos.heightRange.Begin();
+	return crp::CoinReleasePlan::GetInstance().pos_v1.heightRange.Begin();
 }
 
 // result = totalAmount * weight / totalWeight

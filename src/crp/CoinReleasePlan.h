@@ -29,6 +29,7 @@ namespace crp // coin_release_plan
 	public:
 		BlockValue();
 		CoinAmount miner;
+		CoinAmount fund;
 		CoinAmount entrust;
 		CoinAmount masternode;
 		CoinAmount topFirst;
@@ -43,10 +44,10 @@ namespace crp // coin_release_plan
 	public:
 		HeightRange();
 		Height Begin() const;
-		Height Range() const;
 		Height Back() const;
 		Height End() const;
 		bool Exists(Height) const;
+		static Height InfiniteHeight();
 	public:
 		Height begin;
 		Height range;
@@ -102,14 +103,12 @@ namespace crp // coin_release_plan
 	class PosPlan : public Plan{
 	public:
 		CoinAmount standardMinerReward;
+		CoinAmount standardFundReward;
 		CoinAmount standardEntrustReward;
 		CoinAmount standardMasternodeReward;
 		CoinAmount monthlyTopFirst;
 		CoinAmount monthlyTopSecond;
-		int month;
-		CoinAmount boobyPrize;
-
-		HeightRange GetSeasonHeightRange(Height) const;
+		CoinAmount boobyPrize; //Rewards for nodes that are on the leaderboard but have not made a block
 	};
 		
 	class Agent {
@@ -139,21 +138,38 @@ namespace crp // coin_release_plan
 		static CoinReleasePlan& GetInstance();
 		CoinReleasePlan();
 		PowPlan pow;
-		PosPlan pos;
+		PosPlan pos_v1;
+		PosPlan pos_v2;
+		Height seasonIntervalHeight;
+		
 		Height forkHeightForSeasonRewardV2;
+		Height forkheight_seasonIntervalHeight;
+		Height forkheight_posV2;
 
+		Height GetSeasonIntervalHeight(Height chainHeight) const;
 		BlockValue GetBlockValue(Height) const;
 		bool IsStartHeight(Height) const;
 		bool InPowHeightRange(Height) const;
 		bool InPosHeightRange(Height) const;
 		bool IsSeasonRewardHeight(Height) const;
-		bool IsFirstHeightOfSeason(Height) const;
-		bool IsLastHeightOfSeason(Height) const;
 		bool IsSeasonRewardV2(Height) const;
 		Season GetSeason(Height) const;
+		const PosPlan& GetPosPlan(Height) const;
+	private:
+		bool IsPosV2(Height) const;
 	};
 
-	std::vector<std::pair<Agentid,CoinAmount>> GetMonthlyDistribution(const std::vector<Agent>& blockCountVec, CoinAmount topFirstTotalAmount, CoinAmount topSecondTotalAmount);
+	class DistributeRule
+	{
+	public:
+		int topFirstCount;
+		int topSecondCount;
+		DistributeRule(int first, int second):
+			topFirstCount(first),topSecondCount(second){}
+		int TotalCount() const;
+	};
+
+	std::vector<std::pair<Agentid,CoinAmount>> GetMonthlyDistribution(const std::vector<Agent>& blockCountVec, CoinAmount topFirstTotalAmount, CoinAmount topSecondTotalAmount, const DistributeRule& rule, CoinAmount boobyPrize);
 	bool LeftAgentMoreActive(const Agent& left, const Agent& right);
 	bool IsPowHeight(Height);
 	bool IsPosHeight(Height);

@@ -74,7 +74,7 @@ public:
     /** Make standard checks */
     bool RequireStandard() const { return fRequireStandard; }
     int64_t TargetSpacing() const;
-    int COINBASE_MATURITY() const { return nMaturity; }
+    int COINBASE_MATURITY(BlockHeight chainHeight) const;
     CAmount MaxMoneyOut() const { return nMaxMoneyOut; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */
     int MasternodeCountDrift() const { return nMasternodeCountDrift; }
@@ -124,6 +124,8 @@ public:
 	BlockHeight forkheight_clearInactiveUser;
 	BlockHeight forkheight_checkPubkeyAddress;
 	BlockHeight forkheight_lockDepriveTx;
+	BlockHeight forkheight_cancelLockDepriveTx;
+	BlockHeight forkheight_increaseMaturity;
 	
 protected:
     CChainParams();
@@ -143,6 +145,7 @@ protected:
     int nToCheckBlockUpgradeMajority;
     int nMasternodeCountDrift;
     int nMaturity;
+    int nMaturity_v2;
     int nModifierUpdateBlock;
     CAmount nMaxMoneyOut;
     int nMinerThreads;

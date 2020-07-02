@@ -35,11 +35,13 @@
 #ifdef DPOS
 #include "entrustment.h"
 #endif
-#include "scriptex.h"
+#include "scriptex.h" // scriptex
+#include "season_reward.h" // seasonreward
 
 using namespace std;
 
 const char * DEFAULT_MNEMONIC_PASSPHRASE = "MyWallet";
+static const int MIN_DEPTH_FOR_USE = 6;
 
 /**
  * Settings
@@ -1662,7 +1664,7 @@ CAmount CWallet::GetBalance() const
             const CWalletTx* pcoin = &(*it).second;
 			bool trusted = pcoin->IsTrusted();
 			//LogPrintf("CWallet::GetBalance|pcoin=%s,pcoin->IsTrusted()=%d\n",pcoin->GetHash().ToString(),trusted);
-            if (trusted)
+            if (trusted && pcoin->GetDepthInMainChain() >= MIN_DEPTH_FOR_USE)
            	{
            		CAmount credit = pcoin->GetAvailableCredit();
 				//LogPrintf("CWallet::GetBalance|credit=%lld\n",credit);
@@ -1929,7 +1931,7 @@ CAmount CWallet::GetUnconfirmedBalance() const
         LOCK2(cs_main, cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
-            if (!IsFinalTx(*pcoin) || (!pcoin->IsTrusted() && pcoin->GetDepthInMainChain() == 0))
+            if (!IsFinalTx(*pcoin) || pcoin->GetDepthInMainChain() < MIN_DEPTH_FOR_USE)
                 nTotal += pcoin->GetAvailableCredit();
         }
     }
@@ -2143,7 +2145,8 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                 if ((mine & ISMINE_MULTISIG) != ISMINE_NO)
                     fIsSpendable = true;
 
-				if(chainActive.Height() >= Params().forkheight_lockDepriveTx){
+				const BlockHeight currentBlockHeight = chainActive.Height();
+				if(Params().forkheight_lockDepriveTx <= currentBlockHeight && currentBlockHeight < Params().forkheight_cancelLockDepriveTx){
 					if(tx->IsDeprive() && nDepth < Entrustment::GetInstance().GetDepriveTxLockHeight()){
 						fIsSpendable = false;
 					}
@@ -2271,7 +2274,7 @@ bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int
 		}
 
         //check that it is matured
-        if (out.nDepth < (tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10)){
+        if (out.nDepth < (tx->IsCoinStake() ? Params().COINBASE_MATURITY(chainActive.Height()) : 10)){
 			//LogPrint("miner","CWallet::SelectStakeCoins | maturity not match. out.nDepth=%d, tx->IsCoinStake()=%d, Params().COINBASE_MATURITY()=%d, txid=%s\n",out.nDepth, tx->IsCoinStake(), Params().COINBASE_MATURITY(),txid.ToString());
 			continue;
 		}
@@ -2339,7 +2342,7 @@ int CWallet::GetStakableCoinsNum() const
 		CBlockIndex* utxoBlock = mapBlockIndex.at(tx->hashBlock);
         if (GetAdjustedTime() - utxoBlock->GetBlockTime() < nStakeMinAge)
 			continue;
-        if (out.nDepth < (tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+        if (out.nDepth < (tx->IsCoinStake() ? Params().COINBASE_MATURITY(chainActive.Height()) : 10))
 			continue;
 
         count++;
@@ -2463,15 +2466,14 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
     vector<COutput> vCoins;
     AvailableCoins(vCoins, true, coinControl, false, coin_type, useIX);
 
-	//#ifdef DPOS
-	//LogPrintf("DPOS CWallet::SelectCoins | AvailableCoins, vCoins.size=%d\n",vCoins.size());
-	//for(COutput& out : vCoins)
-	//	LogPrintf("DPOS CWallet::SelectCoins | AvailableCoins, tx=%s, vout=%d\n",out.tx->GetHash().ToString(),out.i);
-	//#endif
+	const int minConfirm = MIN_DEPTH_FOR_USE;
 
 	if(coinControl && coinControl->nMinUtxoValue > 0){
 		BOOST_FOREACH (const COutput& out, vCoins) {
 			if (!out.fSpendable)
+				continue;
+
+			if(out.nDepth < minConfirm)
 				continue;
 
 			CAmount nValue = out.tx->vout[out.i].nValue;
@@ -2547,8 +2549,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
         return (nValueRet >= nTargetValue);
     }
 
-    return (SelectCoinsMinConf(nTargetValue, 1, 6, vCoins, setCoinsRet, nValueRet) ||
-            SelectCoinsMinConf(nTargetValue, 1, 1, vCoins, setCoinsRet, nValueRet) ||
+    return (SelectCoinsMinConf(nTargetValue, minConfirm, minConfirm, vCoins, setCoinsRet, nValueRet) ||
             (bSpendZeroConfChange && SelectCoinsMinConf(nTargetValue, 0, 1, vCoins, setCoinsRet, nValueRet)));
 }
 
@@ -2925,6 +2926,16 @@ static void PushBackTxOutToTx(CMutableTransaction& txNew, const CTxOut& txOut)
 				<< valtype(senderPubKey.begin(),senderPubKey.end()) << valtype(senderSignature)
 				<< opcode;
 		}
+	}
+	else if(scriptex::IsBlackAgent(txout.scriptPubKey))
+	{
+		AgentID agentid;
+		scriptex::bytes_t signature;
+		scriptex::DecodeBlackAgentFromScript(txout.scriptPubKey,agentid,signature);
+		assert(signature.empty());
+		assert(pwalletMain);
+		signature = seasonreward::AdminSign(seasonreward::HashBlackAgentTx(txNew.vin,agentid),*pwalletMain);
+		txout.scriptPubKey = seasonreward::AppendSigToBlackAgentScript(txout.scriptPubKey,signature);
 	}
 
 	txNew.vout.push_back(txout);
@@ -4957,7 +4968,7 @@ int CMerkleTx::GetBlocksToMaturity() const
     LOCK(cs_main);
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
-    return max(0, (Params().COINBASE_MATURITY() + 1) - GetDepthInMainChain());
+    return max(0, (Params().COINBASE_MATURITY(chainActive.Height()) + 1) - GetDepthInMainChain());
 }
 
 
@@ -6263,13 +6274,35 @@ bool CWallet::DecryptMnemonicContainer(MnemonicContainer& mnContainer)
     return true;
 }
 
+CWalletTx CWallet::CreateAddBlackAgentTx(AgentID agent)
+{
+	CScript script;
+	CAmount nValue = 0;
+	CWalletTx wtxNew;
+	CReserveKey reservekey(pwalletMain);
+	CAmount nFeeRequired;
+	std::string strError;
+	CCoinControl* pCoinCtrl = nullptr;
+	bool fUseIX = false;
+	
+	script = scriptex::EncodeBlackAgentToScript(agent);
+	
+	if (!CreateTransaction(script, nValue, wtxNew, reservekey, nFeeRequired, strError, pCoinCtrl, ALL_COINS, fUseIX, (CAmount)0)) {
+		if (nValue + nFeeRequired > GetBalance())
+			strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
+		throw std::runtime_error(strError);
+	}
+
+	return wtxNew;
+}
+
 CAmount CWalletTx::GetAvailableCredit(bool fUseCache) const
 {
     if (pwallet == 0)
         return 0;
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if ((IsCoinBase()||IsCoinStake()) && GetBlocksToMaturity() > 0)
         return 0;
 
     if (fUseCache && fAvailableCreditCached)

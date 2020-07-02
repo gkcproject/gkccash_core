@@ -11,6 +11,7 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "main.h"
+#include "forkheights.h" // forkheight_release_v_2_4_1, forkheight_release_v_2_4_0
 
 #include <assert.h>
 
@@ -25,8 +26,6 @@ struct SeedSpec6 {
 };
 
 #include "chainparamsseeds.h"
-
-static const BlockHeight forkheight_release = 207282;
 
 /**
  * Main network
@@ -79,7 +78,9 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
 	(36800,uint256("a7327dc502c7981e7a55607898b394b771f12b7c1a20c03f3720c6ecf9ebb6cc"))
 	(36900,uint256("580079f9c6bd3883897bb5446e4b0d856d21864c9ab18cfcf4592c03275f4866"))
 	(37000,uint256("1e6cd3d8dc0b3a1a9c8fe6155cc7c58204cd5cd92e00d58819ecc460e596c3ab"))
-	(37050,uint256("9c27405d20bb6545e70ff97a46fedd74485e082ab9371344efa1868d11c59f01"));
+	(37050,uint256("9c27405d20bb6545e70ff97a46fedd74485e082ab9371344efa1868d11c59f01"))
+	(204389,uint256("a8194dd30f1bed4ac02538c32ef8b330022cbb93b68e39d44c721a2720eee197"))
+	(207282,uint256("663ebd87401399b891e6a63e692a71d2f99ee4bd0fd4508c6a3dc03cc5aa8d79"));
 
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
@@ -118,8 +119,10 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params() const
 
 CChainParams::CChainParams()
 {
-	forkheight_checkPubkeyAddress = forkheight_release;
-	forkheight_lockDepriveTx = forkheight_release;
+	forkheight_checkPubkeyAddress = forkheight_release_v_2_4_0;
+	forkheight_lockDepriveTx = forkheight_release_v_2_4_0;
+	forkheight_increaseMaturity = forkheight_release_v_2_4_1;
+	forkheight_cancelLockDepriveTx = forkheight_release_v_2_4_1;
 }
 
 class CMainParams : public CChainParams
@@ -149,6 +152,7 @@ public:
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
         nMaturity = 6;
+		nMaturity_v2 = 100;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 21148191990 * COIN;
 
@@ -232,6 +236,9 @@ public:
 		vSeeds.push_back(CDNSSeedData("seed8.gogkc.com","seed8.gogkc.com"));
 		vSeeds.push_back(CDNSSeedData("seed9.gogkc.com","seed9.gogkc.com"));
 		vSeeds.push_back(CDNSSeedData("seed10.gogkc.com","seed10.gogkc.com"));
+		vSeeds.push_back(CDNSSeedData("seed01.gogkc.cash","seed01.gogkc.cash"));
+		vSeeds.push_back(CDNSSeedData("seed02.gogkc.cash","seed02.gogkc.cash"));
+		vSeeds.push_back(CDNSSeedData("seed03.gogkc.cash","seed03.gogkc.cash"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 38); // 38 -> 'G', refer to: https://en.bitcoin.it/wiki/List_of_address_prefixes
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 5);
@@ -273,8 +280,8 @@ public:
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
 
 		nMnemonicBlock = 1;
-		forkheight_clearInactiveUser = forkheight_release;
-		forkheight_modifyAdPrice = forkheight_release; // blockheight in MAINNET
+		forkheight_clearInactiveUser = forkheight_release_v_2_4_0;
+		forkheight_modifyAdPrice = forkheight_release_v_2_4_0; // blockheight in MAINNET
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
@@ -290,13 +297,21 @@ see block version setting in CreateNewBlock()
 */
 
 int CChainParams::Zerocoin_StartHeight() const { 
-	return crp::CoinReleasePlan::GetInstance().pos.heightRange.Begin() + 1;
+	// Fix me: How to query POS plans based on different chain heights
+	return crp::CoinReleasePlan::GetInstance().GetPosPlan(0).heightRange.Begin() + 1;
 }
 int CChainParams::Contract_StartHeight() const {
 	return Zerocoin_StartHeight() + 1;
 }
 int64_t CChainParams::TargetSpacing() const{
 	return crp::CoinReleasePlan::GetInstance().pow.velocity;
+}
+
+int CChainParams::COINBASE_MATURITY(BlockHeight chainHeight) const {
+	int n = nMaturity;
+	if(chainHeight >= forkheight_increaseMaturity)
+		n = nMaturity_v2;
+	return n;
 }
 
 bool CChainParams::IsTimeProtocolV2(const int nHeight) const {
