@@ -31,11 +31,10 @@ See depends/README.md
 
 ### PoW Rewards Breakdown
 
-<table>
-<th>First Block</th>		<th>Last Block</th> 	<th>Miner            </th> 	<th>Total            </th>
-<tr> <td>          1</td> 	<td>         1</td> 	<td>23000000.00000000</td> 	<td>23000000.00000000</td> </tr>
-<tr> <td>          2</td> 	<td>      3000</td> 	<td>     170.00000000</td> 	<td>  509830.00000000</td> </tr>
-<tr> <td>      Total</td> 	<td>          </td> 	<td>                 </td> 	<td>23509830.00000000</td> </tr>
+<table> 
+<th>First Block</th>		 <th>Last Block</th>    <th>Miner</th> 	            <th>Total</th>              	<th>Acc</th>   
+<tr> <td>1</td> 	       <td>  1</td> 	        <td>23000000.00000000</td> 	<td>23000000.00000000</td>    <td>23000000.00000000</td> </tr>
+<tr> <td>2</td> 	       <td>3000</td>          <td>170.00000000</td> 	    <td>509830.00000000</td>      <td>23509830.00000000</td> </tr>
 </table>
 
 
