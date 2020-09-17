@@ -38,6 +38,7 @@ BITCOIN_TESTS =\
   test/crp_tests.cpp \
   test/scriptex_tests.cpp \
   test/entrustment_impl_tests.cpp \
+  test/entrustment_tests.cpp \
   test/contract_call_script_tests.cpp \
   test/bip39_tests.cpp \
   test/entrust_reward_tests.cpp \

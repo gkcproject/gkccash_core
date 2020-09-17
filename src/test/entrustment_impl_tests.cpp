@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(test_read_entrustment_v101)
 		);
 	AgentMapMap agentMaps;
 	map<BlockHeight,Blacklist> blackListStatus;
-	BOOST_CHECK(read_entrustment_v101(is,agentMaps,blackListStatus));
+	BOOST_CHECK(read_entrustment_v2(is,agentMaps,blackListStatus));
 	BOOST_CHECK(blackListStatus.size() == 1);
 	BOOST_CHECK(blackListStatus.count(0) > 0);
 	if(blackListStatus.count(0) > 0)

@@ -91,7 +91,7 @@ Rectangle {
 	            property bool ctrlPressed: false
 	            anchors.fill:parent
 	            id: text_textField
-	            readOnly: root.readOnly
+	            //readOnly: root.readOnly
             	selectByKeyboard: true
 	            selectByMouse: true
 	            //tabStopDistance: 20

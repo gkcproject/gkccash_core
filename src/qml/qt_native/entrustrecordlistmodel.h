@@ -14,7 +14,8 @@ class EntrustRecord
 {
 public:
     EntrustRecord(const QString &txid,const double &vout,const QString &agent,
-                const double &amount):txid_(txid),vout_(vout),agent_(agent),amount_(amount)
+                const double &amount,const QString &agentname)
+                :txid_(txid),vout_(vout),agent_(agent),amount_(amount),agentname_(agentname)
     {
     }
     
@@ -22,12 +23,14 @@ public:
     double VOUT() const {return this->vout_;}
     QString AGENT() const {return this->agent_;}
     double AMOUNT() const {return this->amount_;}
+	QString AGENTNAME() const {return this->agentname_;}
     QVariant  obj;
 private:
     QString txid_;
     double vout_;
     QString agent_;
     double amount_;
+	QString agentname_;
 };
 
 class EntrustRecordListModel : public QAbstractListModel
@@ -37,22 +40,25 @@ public:
     enum DataType{
         TxID,
         Vout,
-        Agent,
+        AgentHash,
         Amount,
+        AgentName,
 		Operation
     };
     EntrustRecordListModel(CWallet* pwallet, QObject*  parent=NULL);
 
     void pushdata(const QString &txid,const double &vout,const QString &agent,
-                const double &amount);
+                const double &amount,const QString &agentname);
     void minsert(int index, const QString &txid,const double &vout,
-                const QString &agent, const double &amount);
+                const QString &agent, const double &amount,const QString &agentname);
     void mremove(int index);
     void Add(EntrustRecord&  er);
     void clear();
     QVariant data(const QModelIndex &index, int role =Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent  = QModelIndex() ) const;
     QHash<int, QByteArray> roleNames()  const;
+
+	Agent* GetAgentName(AgentID id);
 
 	Q_INVOKABLE void UpdateEntrustRecordList();
 	Q_INVOKABLE void UpdateRedeemRecordList();

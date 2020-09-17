@@ -126,6 +126,7 @@ public:
 	BlockHeight forkheight_lockDepriveTx;
 	BlockHeight forkheight_cancelLockDepriveTx;
 	BlockHeight forkheight_increaseMaturity;
+	BlockHeight forkheight_addJoinHeight;
 	
 protected:
     CChainParams();

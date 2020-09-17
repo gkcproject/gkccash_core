@@ -5,7 +5,7 @@
 #include <limits>
 #include "uint256.h"
 #include "main.h"
-#include "forkheights.h" // forkheight_release_v_2_4_1
+#include "forkheights.h" // forkheight_release_v_2_5_1
 
 using namespace std;
 using namespace crp;
@@ -88,7 +88,7 @@ CoinReleasePlan::CoinReleasePlan(){
 	forkHeightForSeasonRewardV2  = 92281; // second reward height of season
 	seasonIntervalHeight         = pos_v1.BlockNumPerMonth();
 	forkheight_seasonIntervalHeight = std::numeric_limits<Height>::max(); // never fork
-	forkheight_posV2 = forkheight_release_v_2_4_1;
+	forkheight_posV2 = forkheight_release_v_2_5_1;
 }
 
 Height crp::CoinReleasePlan::GetSeasonIntervalHeight(Height chainHeight) const

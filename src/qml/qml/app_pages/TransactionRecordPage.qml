@@ -110,6 +110,8 @@ Controls_1_4.Tab {
                 ListElement { modelData: qsTr("Bonus Reward"); }
 				ListElement { modelData: qsTr("Entrust"); }
 				ListElement { modelData: qsTr("Deprive"); }
+				ListElement { modelData: qsTr("GasRefund"); }
+				ListElement { modelData: qsTr("FundReward"); }
                 ListElement { modelData: qsTr("Other"); }
 
 

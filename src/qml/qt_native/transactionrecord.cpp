@@ -68,6 +68,10 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 						if(wtx.vout[i].IsEntrustReward()){
 							sub.type = TransactionRecord::EntrustReward;
 						}
+						else if(wtx.vout[i].IsFundReward())
+						{
+							sub.type = TransactionRecord::FundReward;
+						}
 						else if(wtx.vout[i].IsMasternodeReward())
 						{
 							sub.type = TransactionRecord::MNReward;

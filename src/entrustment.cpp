@@ -9,7 +9,7 @@
 #include <boost/filesystem.hpp>
 #include "entrustment_impl.h"
 #include "scriptex.h"
-#include "forkheights.h" // forkheight_release_v_2_4_1, forkheight_release_v_2_4_0
+#include "forkheights.h" // forkheight_release_v_2_5_1, forkheight_release_v_2_4_0
 
 using namespace dpos;
 using namespace entrustment_impl;
@@ -84,6 +84,8 @@ bool dpos::FindConfirmedTransaction(const uint256& txid, CTransaction& txOut)
 //////////////////////////////////////
 UserStatistics::UserStatistics()
 {
+	version = Default;
+	joinHeight = 0;
 	entrustAmount = 0;
 	totalDealDivideReward = 0;
 	totalDividendReward = 0;
@@ -91,15 +93,41 @@ UserStatistics::UserStatistics()
 UniValue UserStatistics::ToUniValue() const
 {
 	UniValue root(UniValue::VOBJ);
+	root.push_back(Pair("version",version));
+	root.push_back(Pair("joinHeight",joinHeight));
 	root.push_back(Pair("totalDealDivideReward",FormatMoney(totalDealDivideReward)));
 	root.push_back(Pair("totalDividendReward",FormatMoney(totalDividendReward)));
 
 	return root;
 }
+bool UserStatistics::OutputTo(ostream& os) const
+{
+	os << version << ' ' << joinHeight << ' ' << entrustAmount << ' ' << totalDealDivideReward << ' ' << totalDividendReward;
+	return os.good();
+}
+bool UserStatistics::InputFrom(istream& is)
+{
+	is >> version >> joinHeight >> entrustAmount >> totalDealDivideReward >> totalDividendReward;
+	return is.good();
+}
+
+ostream& operator<< (ostream& os, const dpos::UserStatistics& u)
+{
+	u.OutputTo(os);
+	return os;
+}
+
+istream& operator>> (istream& is, dpos::UserStatistics& u)
+{
+	u.InputFrom(is);
+	return is;
+}
 
 //////////////////////////////////////
 Agent::Agent()
 {
+	version = Default;
+	id = 0;
 	receivedTotalAmount = 0;
 	generatedBlockAmount = 0;
 	lastBlockTime = 0;
@@ -107,6 +135,7 @@ Agent::Agent()
 }
 Agent::Agent(AgentID id)
 {
+	version = Default;
 	this->id = id;
 	receivedTotalAmount = 0;
 	generatedBlockAmount = 0;
@@ -254,6 +283,7 @@ size_t Agent::MemorySize() const
 //////////////////////////////////////////////////
 Entrustment::Entrustment()
 {
+	version = Default;
 	const crp::PosPlan& posplan = crp::CoinReleasePlan::GetInstance().GetPosPlan(0);
 	createAgentAmount = 3000 * COIN;
 	minEntrustAmount = 100 * COIN;
@@ -268,8 +298,8 @@ Entrustment::Entrustment()
 	forkheight_halfMinEntrustAmount = forkheight_release_v_2_4_0;
 	forkheight_halfCreateAgentAmount = forkheight_release_v_2_4_0;
 	forkheight_halfMinDivideReward = forkheight_release_v_2_4_0;
-	forkheight_seasonRewardTop150 = forkheight_release_v_2_4_1;
-	forkheight_blackAgentList = forkheight_release_v_2_4_1;
+	forkheight_seasonRewardTop150 = forkheight_release_v_2_5_1;
+	forkheight_blackAgentList = forkheight_release_v_2_5_1;
 }
 
 CAmount Entrustment::GetMinDivideReward(BlockHeight h) const
@@ -344,6 +374,8 @@ std::map<CBitcoinAddress,CAmount> Entrustment::GetExpectDivideRewardMap(BlockHei
 		const UserStatistics& baseHeightDivide = it->second;
 		const UserStatistics* prevHeightDivide = GetUserStatistics(prevHeight,agentid,user);
 		if(prevHeightDivide == nullptr && height >= Params().forkheight_clearInactiveUser)
+			continue;
+		if(baseheight < prevHeightDivide->joinHeight && height >= Params().forkheight_addJoinHeight)
 			continue;
 		const CAmount prevDividend = prevHeightDivide ? prevHeightDivide->totalDividendReward : 0;
 		if(!prevHeightDivide)
@@ -576,7 +608,6 @@ void Entrustment::WriteToBackupFile(BlockHeight height)
 		return;
 	}
 
-	const int version = 101;
 	file << version << endl;
 
 	AgentMapMap::const_iterator heightMapIt = agentMaps.find(height);
@@ -608,14 +639,14 @@ bool read_entrustment_v0(std::istream& is, BlockHeight height, int agentCount, A
 	return read_agent_map_from_istream(is,agentCount,agentMaps[height]);
 }
 
-bool read_entrustment_v100(std::istream& is, AgentMapMap& agentMaps)
+bool read_entrustment_v1(std::istream& is, AgentMapMap& agentMaps)
 {
 	int heightCount = 0, height = 0, agentCount = 0;
 	is >> heightCount;
 	while(heightCount--){
 		is >> height;
 		is >> agentCount;
-		LogPrint("dpos","read_entrustment_v100 | Read %d agent at height %d ...\n",agentCount,height);
+		LogPrint("dpos","read_entrustment_v1 | Read %d agent at height %d ...\n",agentCount,height);
 		bool ok = read_agent_map_from_istream(is,agentCount,agentMaps[height]);
 		if(!ok)
 			return false;
@@ -633,36 +664,34 @@ bool Entrustment::ReadFromBackupFile(BlockHeight height)
 		return false;
 	}
 
-	int version = 0;
-	file >> version;
+	int dataVersion = 0;
+	file >> dataVersion;
 
-	if(version >= 101)
-		return read_entrustment_v101(file,agentMaps,blackListStatus);
-	if(version >= 100)
-		return read_entrustment_v100(file,agentMaps);
+	if(dataVersion >= Entrustment::V3)
+		return read_entrustment_v3(file,agentMaps,blackListStatus);
+	if(dataVersion >= Entrustment::V2)
+		return read_entrustment_v2(file,agentMaps,blackListStatus);
+	if(dataVersion >= Entrustment::V1)
+		return read_entrustment_v1(file,agentMaps);
 	return read_entrustment_v0(file,height,version,agentMaps);
 }
 
-std::ostream& operator<<(std::ostream& os, const Agent& a)
+bool Agent::SerializeToText(std::ostream& os) const
 {
+	const Agent& a = *this;
+
+	os << a.version << endl;
+	
 	os << a.id.ToString() << endl;
 	
 	os << (a.name.empty() ? std::string("null") : a.name) << endl;
 	
 	os << a.receivedTotalAmount << endl;
 
-	int outpointsSize = 0;
-	os << outpointsSize << endl;
-	
-	os << a.userStatistics.size() << endl;
-	for(const std::pair<CBitcoinAddress,UserStatistics>& userAmount : a.userStatistics){
-		os << userAmount.first.ToString() << ' ' << userAmount.second.entrustAmount << endl;
-	}
-	
 	os << a.userStatistics.size() << endl;
 	for(const std::pair<CBitcoinAddress,UserStatistics>& userDivide : a.userStatistics){
 		const UserStatistics& divide = userDivide.second;
-		os << userDivide.first.ToString() << ' ' << divide.totalDealDivideReward << ' ' << divide.totalDividendReward << endl;
+		os << userDivide.first.ToString() << ' ' << divide << endl;
 	}
 	
 	os << a.generatedBlockAmount << endl;
@@ -673,10 +702,19 @@ std::ostream& operator<<(std::ostream& os, const Agent& a)
 	os << a.monthlyCount.blockAmount << ' ' << a.monthlyCount.entrustAmount << ' ' << a.monthlyCount.reward_factor.ToString() << ' ' << a.monthlyCount.expect_reward << endl;
 
 	os << a.last_season_reward;
-	
+	return true;
 }
 
-std::istream& operator>>(std::istream& is, Agent& a)
+std::ostream& operator<<(std::ostream& os, const Agent& a)
+{
+	a.SerializeToText(os);
+	return os;
+}
+
+bool UnserializeAgentFromText_Part1(std::istream& is, Agent& a);
+bool UnserializeAgentFromText_Part2(std::istream& is, Agent& a);
+
+bool UnserializeAgentFromText_Part1(std::istream& is, Agent& a)
 {
 	std::string str;
 	int size = 0;
@@ -708,6 +746,19 @@ std::istream& operator>>(std::istream& is, Agent& a)
 	is >> a.receivedTotalAmount;
 	//LogPrint("dpos","std::istream& operator>>(std::istream& is, Agent& a) | info | receivedTotalAmount=%lld\n",a.receivedTotalAmount);
 	
+	return true;
+}
+
+bool Agent::UnserializeFromTextWithoutVersion(std::istream& is)
+{
+	Agent& a = *this;
+	
+	std::string str;
+	int size = 0;
+	int64_t num = 0, num2 = 0;
+
+	UnserializeAgentFromText_Part1(is,*this);
+
 	is >> size;
 	//LogPrint("dpos","std::istream& operator>>(std::istream& is, Agent& a) | info | outpoints.size=%d\n",size);
 	while(size-- > 0){
@@ -724,13 +775,24 @@ std::istream& operator>>(std::istream& is, Agent& a)
 	}
 	
 	is >> size;
-	//LogPrint("dpos","std::istream& operator>>(std::istream& is, Agent& a) | info | divide.size=%d\n",size);
 	while(size-- > 0){
 		is >> str >> num >> num2;
 		UserStatistics& staticstics = a.userStatistics[CBitcoinAddress(str)];
 		staticstics.totalDealDivideReward = num;
 		staticstics.totalDividendReward = num2;
 	}
+
+	UnserializeAgentFromText_Part2(is,*this);
+
+	return true;
+}
+
+
+bool UnserializeAgentFromText_Part2(std::istream& is, Agent& a)
+{
+	std::string str;
+	int size = 0;
+	int64_t num = 0, num2 = 0;
 
 	is >> a.generatedBlockAmount;
 	//LogPrint("dpos","std::istream& operator>>(std::istream& is, Agent& a) | info | generatedBlockAmount=%d\n",a.generatedBlockAmount);
@@ -746,6 +808,37 @@ std::istream& operator>>(std::istream& is, Agent& a)
 	//LogPrint("dpos","std::istream& operator>>(std::istream& is, Agent& a) | info | a.monthlyCount: blockAmount=%d, entrustAmount=%lld\n",a.monthlyCount.blockAmount,a.monthlyCount.entrustAmount);
 
 	is >> a.last_season_reward;
+
+	return true;
+}
+
+bool Agent::UnserializeFromText(std::istream& is)
+{
+	Agent& a = *this;
+
+	is >> a.version;
+	
+	std::string str;
+	int size = 0;
+	int64_t num = 0, num2 = 0;
+	
+	UnserializeAgentFromText_Part1(is,*this);
+	
+	is >> size;
+	while(size-- > 0){
+		is >> str;
+		UserStatistics& staticstics = a.userStatistics[CBitcoinAddress(str)];
+		is >> staticstics;
+	}
+
+	UnserializeAgentFromText_Part2(is,*this);
+	return is.good();
+}
+
+std::istream& operator>>(std::istream& is, Agent& a)
+{
+	a.UnserializeFromText(is);
+	return is;
 }
 
 std::string Entrustment::GetBackupFileName(BlockHeight height)
@@ -870,68 +963,16 @@ const AgentMap* Entrustment::GetAgentMapWithMaxHeight() const
 	return &agentMaps.at(h);
 }
 
-bool Entrustment::AddAgentTx(BlockHeight height, CTransaction& tx)
-{
-	//LogPrintf("DPOS Entrustment::AddAgentTx | height=%d, tx=%s\n", height, tx.ToString());
-	Agent* agent = GetAgent(height,tx.agentid);
-	if(!agent)
-		return false;
-	
-	std::vector<CTxOut>& vout = tx.vout;
-	size_t size = vout.size();
-	for(int i=0; i<size; i++)
-	{
-		CTxOut& txout = vout[i];
-		if(txout.IsEntrusted())
-		{
-			assert(agent);
-			std::vector<CBitcoinAddress> addresses = txout.GetScriptAddresses();
-			if(addresses.empty())
-				throw std::runtime_error("Entrustment::AddAgentTx addresses.empty()");
-			CBitcoinAddress user = addresses[0];
-			agent->AddAmount(user,txout.nValue);
-		}
-	}
-	return true;
-}
-
 bool Entrustment::AddEntrust(BlockHeight height, CBitcoinAddress addr, AgentID agentid, CAmount amount)
 {
 	Agent* agent = GetAgent(height,agentid);
 	if(!agent)
 		return false;
-	
-	agent->AddAmount(addr,amount);
-	return true;
-}
 
-bool Entrustment::DelAgentTx(BlockHeight height, CTransaction& tx)
-{
-	//LogPrintf("DPOS Entrustment::DelAgentTx | tx=%s, tx.vin.size=%d\n",tx.GetHash().GetHex().c_str(),tx.vin.size());
-	Agent* agent = GetAgent(height,tx.agentid);
-	if(!agent)
-		return false;
-	
-	assert(tx.IsDeprive());
-	std::vector<CTxIn>& vin = tx.vin;
-	for(const CTxIn& txin : vin)
-	{
-		const COutPoint& outpoint = txin.prevout;
-		CTxOut txout;
-		if(GetConfirmedTxOut(outpoint,txout))
-		{
-			//LogPrintf("DPOS Entrustment::DelAgentTx | outpoint=%s, txout=%s\n",
-			//	outpoint.ToString(), txout.ToString());
-			if(txout.IsEntrusted())
-			{
-				std::vector<CBitcoinAddress> addresses = txout.GetScriptAddresses();
-				if(addresses.empty())
-					throw std::runtime_error("Entrustment::AddAgentTx addresses.empty()");
-				CBitcoinAddress user = addresses[0];
-				agent->DelAmount(user,txout.nValue);
-			}
-		}
-	}
+	if(agent->userStatistics[addr].entrustAmount == 0 && height >= Params().forkheight_addJoinHeight)
+		agent->userStatistics[addr].joinHeight = height;
+		
+	agent->AddAmount(addr,amount);
 	return true;
 }
 
@@ -1343,12 +1384,12 @@ UniValue Entrustment::ToUniValue() const
 		heightMapArray.push_back(heightObj);
 	}
 
-	
+	BlockHeight chainheight = chainActive.Height();
 	UniValue root(UniValue::VOBJ);
 	root.push_back(Pair("myAgentId",myAgentId.GetHex()));
-	root.push_back(Pair("createAgentAmount",FormatMoney(createAgentAmount)));
-	root.push_back(Pair("minEntrustAmount",FormatMoney(minEntrustAmount)));
-	root.push_back(Pair("minDivideReward",FormatMoney(minDivideReward)));
+	root.push_back(Pair("createAgentAmount",FormatMoney(GetCreateAgentAmount(chainheight))));
+	root.push_back(Pair("minEntrustAmount",FormatMoney(GetMinEntrustAmount(chainheight))));
+	root.push_back(Pair("minDivideReward",FormatMoney(GetMinDivideReward(chainheight))));
 	root.push_back(Pair("depriveLockHeight",depriveLockHeight));
 	root.push_back(Pair("agentMaps.size",agentMaps.size()));
 	root.push_back(Pair("agentMaps",heightMapArray));

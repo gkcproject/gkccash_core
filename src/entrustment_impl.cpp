@@ -51,7 +51,7 @@ void entrustment_impl::WriteBlacklistToFile(const Blacklist& blist, std::ostream
 	os << std::flush;
 }
 
-bool entrustment_impl::read_entrustment_v101(std::istream& is, AgentMapMap& agentMaps, map<BlockHeight,Blacklist>& blackListStatus)
+bool entrustment_impl::read_entrustment_v2(std::istream& is, AgentMapMap& agentMaps, map<BlockHeight,Blacklist>& blackListStatus)
 {
 	int height = 0, agentCount = 0 , blackCount = 0;
 	is >> height;
@@ -67,11 +67,27 @@ bool entrustment_impl::read_entrustment_v101(std::istream& is, AgentMapMap& agen
 	return ok;
 }
 
+bool entrustment_impl::read_entrustment_v3(std::istream& is, AgentMapMap& agentMaps, map<BlockHeight,Blacklist>& blackListStatus)
+{
+	int height = 0, agentCount = 0 , blackCount = 0;
+	is >> height;
+	is >> agentCount;
+	for(int i=0; i<agentCount; i++){
+		Agent agent;
+		is >> agent;
+		agentMaps[height].insert(make_pair(agent.id,agent));
+	}
+	is >> blackCount;
+	is.ignore();
+	bool ok = read_blacklist_from_istream(is,blackCount,blackListStatus[height]);
+	return ok;
+}
+
 bool entrustment_impl::read_agent_map_from_istream(std::istream& file, int count, AgentMap& agentMap)
 {
 	for(int i=0; i<count; i++){
 		Agent agent;
-		file >> agent;
+		agent.UnserializeFromTextWithoutVersion(file);
 		agentMap.insert(make_pair(agent.id,agent));
 	}
 	return true;

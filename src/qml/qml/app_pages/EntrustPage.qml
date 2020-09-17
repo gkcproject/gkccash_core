@@ -315,9 +315,9 @@ Controls_1_4.Tab {
             anchors.bottomMargin: 201
             visible:entrustRecordVisible
             
-            roles:  ["agent","amount","txid","vout","operation"]
-            titles: ["NodeID","Entrusts(GKC)","TXID","VoutIndex","Operation"]
-            widths: [520,200,400,200,200]
+            roles:  ["agent","agentname","amount","txid","operation"]
+            titles: ["NodeID","NodeName","Entrusts(GKC)","TXID","Operation"]
+            widths: [520,200,200,400,200]
 			
 			model:walletModel.entrustRecords_Proxy
 			

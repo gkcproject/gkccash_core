@@ -23,9 +23,11 @@ void EntrustRecordListProxy::sortColumn(QString roleName, Qt::SortOrder order)
     else if(roleName == "vout")
         ci = EntrustRecordListModel::Vout;
     else if(roleName == "agent")
-        ci = EntrustRecordListModel::Agent;
+        ci = EntrustRecordListModel::AgentHash;
     else if(roleName == "amount")
         ci = EntrustRecordListModel::Amount;
+	else if(roleName == "agentname")
+        ci = EntrustRecordListModel::AgentName;
 
     sort(ci,order);
 }

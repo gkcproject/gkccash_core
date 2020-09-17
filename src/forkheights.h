@@ -9,6 +9,6 @@
 #define FORKHEIGHTS_H
 
 #define forkheight_release_v_2_4_0 (207282)
-#define forkheight_release_v_2_4_1 (245436)
+#define forkheight_release_v_2_5_1 (245436)
 
 #endif // ~FORKHEIGHTS_H

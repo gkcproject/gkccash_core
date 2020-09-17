@@ -11,7 +11,7 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "main.h"
-#include "forkheights.h" // forkheight_release_v_2_4_1, forkheight_release_v_2_4_0
+#include "forkheights.h" // forkheight_release_v_2_5_1, forkheight_release_v_2_4_0
 
 #include <assert.h>
 
@@ -121,8 +121,8 @@ CChainParams::CChainParams()
 {
 	forkheight_checkPubkeyAddress = forkheight_release_v_2_4_0;
 	forkheight_lockDepriveTx = forkheight_release_v_2_4_0;
-	forkheight_increaseMaturity = forkheight_release_v_2_4_1;
-	forkheight_cancelLockDepriveTx = forkheight_release_v_2_4_1;
+	forkheight_increaseMaturity = forkheight_release_v_2_5_1;
+	forkheight_cancelLockDepriveTx = forkheight_release_v_2_5_1;
 }
 
 class CMainParams : public CChainParams
@@ -282,6 +282,7 @@ public:
 		nMnemonicBlock = 1;
 		forkheight_clearInactiveUser = forkheight_release_v_2_4_0;
 		forkheight_modifyAdPrice = forkheight_release_v_2_4_0; // blockheight in MAINNET
+		forkheight_addJoinHeight = 352800;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const

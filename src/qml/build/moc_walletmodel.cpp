@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_WalletModel_t {
-    QByteArrayData data[177];
-    char stringdata0[2532];
+    QByteArrayData data[180];
+    char stringdata0[2597];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -83,131 +83,134 @@ QT_MOC_LITERAL(48, 626, 8), // "badWords"
 QT_MOC_LITERAL(49, 635, 15), // "existingAddress"
 QT_MOC_LITERAL(50, 651, 20), // "addAddressSuccessful"
 QT_MOC_LITERAL(51, 672, 7), // "address"
-QT_MOC_LITERAL(52, 680, 12), // "updateStatus"
-QT_MOC_LITERAL(53, 693, 17), // "updateTransaction"
-QT_MOC_LITERAL(54, 711, 17), // "updateAddressBook"
-QT_MOC_LITERAL(55, 729, 5), // "label"
-QT_MOC_LITERAL(56, 735, 6), // "isMine"
-QT_MOC_LITERAL(57, 742, 7), // "purpose"
-QT_MOC_LITERAL(58, 750, 7), // "pubCoin"
-QT_MOC_LITERAL(59, 758, 6), // "isUsed"
-QT_MOC_LITERAL(60, 765, 19), // "updateWatchOnlyFlag"
-QT_MOC_LITERAL(61, 785, 18), // "updateMultiSigFlag"
-QT_MOC_LITERAL(62, 804, 18), // "pollBalanceChanged"
-QT_MOC_LITERAL(63, 823, 18), // "emitBalanceChanged"
-QT_MOC_LITERAL(64, 842, 18), // "updateContractBook"
-QT_MOC_LITERAL(65, 861, 3), // "abi"
-QT_MOC_LITERAL(66, 865, 21), // "checkForInvalidTokens"
-QT_MOC_LITERAL(67, 887, 11), // "backupCheck"
-QT_MOC_LITERAL(68, 899, 16), // "getTxDescription"
-QT_MOC_LITERAL(69, 916, 3), // "row"
-QT_MOC_LITERAL(70, 920, 11), // "caculateSum"
-QT_MOC_LITERAL(71, 932, 4), // "rows"
-QT_MOC_LITERAL(72, 937, 13), // "exportClicked"
-QT_MOC_LITERAL(73, 951, 10), // "chooseType"
-QT_MOC_LITERAL(74, 962, 3), // "idx"
-QT_MOC_LITERAL(75, 966, 10), // "chooseDate"
-QT_MOC_LITERAL(76, 977, 16), // "dateRangeChanged"
-QT_MOC_LITERAL(77, 994, 8), // "fromDate"
-QT_MOC_LITERAL(78, 1003, 6), // "toDate"
-QT_MOC_LITERAL(79, 1010, 13), // "changedPrefix"
-QT_MOC_LITERAL(80, 1024, 6), // "prefix"
-QT_MOC_LITERAL(81, 1031, 13), // "changedAmount"
-QT_MOC_LITERAL(82, 1045, 6), // "amount"
-QT_MOC_LITERAL(83, 1052, 14), // "getlockedCoins"
-QT_MOC_LITERAL(84, 1067, 12), // "GetAllProfit"
-QT_MOC_LITERAL(85, 1080, 9), // "getNodeID"
-QT_MOC_LITERAL(86, 1090, 20), // "GetRedeemDescription"
-QT_MOC_LITERAL(87, 1111, 13), // "GetRedeemTXID"
-QT_MOC_LITERAL(88, 1125, 14), // "GetEntrustSure"
-QT_MOC_LITERAL(89, 1140, 6), // "nodeID"
-QT_MOC_LITERAL(90, 1147, 6), // "number"
-QT_MOC_LITERAL(91, 1154, 4), // "uint"
-QT_MOC_LITERAL(92, 1159, 15), // "RedeemOperation"
-QT_MOC_LITERAL(93, 1175, 4), // "txid"
-QT_MOC_LITERAL(94, 1180, 16), // "EntrustOperation"
-QT_MOC_LITERAL(95, 1197, 6), // "nodeid"
-QT_MOC_LITERAL(96, 1204, 22), // "SendAdvertiseOperation"
-QT_MOC_LITERAL(97, 1227, 10), // "GetMessage"
-QT_MOC_LITERAL(98, 1238, 11), // "InitEntrust"
-QT_MOC_LITERAL(99, 1250, 17), // "GetMyAgentUserNum"
-QT_MOC_LITERAL(100, 1268, 14), // "GetMyUTXOCount"
-QT_MOC_LITERAL(101, 1283, 17), // "GetMyAgentEntrust"
-QT_MOC_LITERAL(102, 1301, 18), // "GetDopsStateString"
-QT_MOC_LITERAL(103, 1320, 14), // "GetStakingStat"
-QT_MOC_LITERAL(104, 1335, 21), // "GetMyMasternodeStatus"
-QT_MOC_LITERAL(105, 1357, 18), // "UpdateMainNodeList"
-QT_MOC_LITERAL(106, 1376, 12), // "formatAmount"
-QT_MOC_LITERAL(107, 1389, 4), // "unit"
-QT_MOC_LITERAL(108, 1394, 9), // "getAmount"
-QT_MOC_LITERAL(109, 1404, 11), // "currentUnit"
-QT_MOC_LITERAL(110, 1416, 9), // "direction"
-QT_MOC_LITERAL(111, 1426, 6), // "factor"
-QT_MOC_LITERAL(112, 1433, 12), // "getClipBoard"
-QT_MOC_LITERAL(113, 1446, 4), // "type"
-QT_MOC_LITERAL(114, 1451, 12), // "setClipBoard"
-QT_MOC_LITERAL(115, 1464, 7), // "variant"
-QT_MOC_LITERAL(116, 1472, 13), // "getFeePerkilo"
-QT_MOC_LITERAL(117, 1486, 13), // "alreadyShowed"
-QT_MOC_LITERAL(118, 1500, 7), // "version"
-QT_MOC_LITERAL(119, 1508, 14), // "getFieldAmount"
-QT_MOC_LITERAL(120, 1523, 10), // "amountText"
-QT_MOC_LITERAL(121, 1534, 17), // "addAddressByWords"
-QT_MOC_LITERAL(122, 1552, 10), // "addressStr"
-QT_MOC_LITERAL(123, 1563, 12), // "rescanWallet"
-QT_MOC_LITERAL(124, 1576, 15), // "validateAddress"
-QT_MOC_LITERAL(125, 1592, 14), // "validateAmount"
-QT_MOC_LITERAL(126, 1607, 15), // "sendtoAddresses"
-QT_MOC_LITERAL(127, 1623, 9), // "getReadMe"
-QT_MOC_LITERAL(128, 1633, 9), // "isTestNet"
-QT_MOC_LITERAL(129, 1643, 19), // "getEncryptionStatus"
-QT_MOC_LITERAL(130, 1663, 18), // "setWalletEncrypted"
-QT_MOC_LITERAL(131, 1682, 7), // "passStr"
-QT_MOC_LITERAL(132, 1690, 16), // "changePassphrase"
-QT_MOC_LITERAL(133, 1707, 10), // "oldPassStr"
-QT_MOC_LITERAL(134, 1718, 10), // "newPassStr"
-QT_MOC_LITERAL(135, 1729, 15), // "setWalletLocked"
-QT_MOC_LITERAL(136, 1745, 6), // "locked"
-QT_MOC_LITERAL(137, 1752, 13), // "anonymizeOnly"
-QT_MOC_LITERAL(138, 1766, 12), // "backupWallet"
-QT_MOC_LITERAL(139, 1779, 8), // "filename"
-QT_MOC_LITERAL(140, 1788, 17), // "checkBackupStatus"
-QT_MOC_LITERAL(141, 1806, 28), // "UpdateNotificationRecordList"
-QT_MOC_LITERAL(142, 1835, 4), // "from"
-QT_MOC_LITERAL(143, 1840, 5), // "count"
-QT_MOC_LITERAL(144, 1846, 21), // "GetNotificationRecord"
-QT_MOC_LITERAL(145, 1868, 20), // "GetNotificationTitle"
-QT_MOC_LITERAL(146, 1889, 21), // "GetEntructDescription"
-QT_MOC_LITERAL(147, 1911, 25), // "notificationRecords_Proxy"
-QT_MOC_LITERAL(148, 1937, 22), // "NotificationListProxy*"
-QT_MOC_LITERAL(149, 1960, 19), // "redeemRecords_Proxy"
-QT_MOC_LITERAL(150, 1980, 23), // "EntrustRecordListProxy*"
-QT_MOC_LITERAL(151, 2004, 20), // "entrustRecords_Proxy"
-QT_MOC_LITERAL(152, 2025, 14), // "nodeList_Proxy"
-QT_MOC_LITERAL(153, 2040, 21), // "EntrustNodeListProxy*"
-QT_MOC_LITERAL(154, 2062, 18), // "mainNodeList_Proxy"
-QT_MOC_LITERAL(155, 2081, 18), // "MainNodeListProxy*"
-QT_MOC_LITERAL(156, 2100, 22), // "transaction_ProxyModel"
-QT_MOC_LITERAL(157, 2123, 23), // "TransactionFilterProxy*"
-QT_MOC_LITERAL(158, 2147, 10), // "syncStatus"
-QT_MOC_LITERAL(159, 2158, 30), // "transaction_ProxyModelOverView"
-QT_MOC_LITERAL(160, 2189, 26), // "receivingAddressProxyModel"
-QT_MOC_LITERAL(161, 2216, 19), // "AddressFilterProxy*"
-QT_MOC_LITERAL(162, 2236, 24), // "sendingAddressProxyModel"
-QT_MOC_LITERAL(163, 2261, 25), // "recentRequestsFilterProxy"
-QT_MOC_LITERAL(164, 2287, 26), // "RecentRequestsFilterProxy*"
-QT_MOC_LITERAL(165, 2314, 19), // "contractfilterproxy"
-QT_MOC_LITERAL(166, 2334, 20), // "ContractFilterProxy*"
-QT_MOC_LITERAL(167, 2355, 12), // "contractPage"
-QT_MOC_LITERAL(168, 2368, 19), // "CreateContractPage*"
-QT_MOC_LITERAL(169, 2388, 16), // "tokenfilterproxy"
-QT_MOC_LITERAL(170, 2405, 17), // "TokenFilterProxy*"
-QT_MOC_LITERAL(171, 2423, 14), // "tokenItemModel"
-QT_MOC_LITERAL(172, 2438, 15), // "TokenItemModel*"
-QT_MOC_LITERAL(173, 2454, 16), // "coinControlProxy"
-QT_MOC_LITERAL(174, 2471, 17), // "CoinControlProxy*"
-QT_MOC_LITERAL(175, 2489, 20), // "masternodetableproxy"
-QT_MOC_LITERAL(176, 2510, 21) // "MasterNodeTableProxy*"
+QT_MOC_LITERAL(52, 680, 17), // "addTokenEntryEmit"
+QT_MOC_LITERAL(53, 698, 12), // "updateStatus"
+QT_MOC_LITERAL(54, 711, 17), // "updateTransaction"
+QT_MOC_LITERAL(55, 729, 17), // "updateAddressBook"
+QT_MOC_LITERAL(56, 747, 5), // "label"
+QT_MOC_LITERAL(57, 753, 6), // "isMine"
+QT_MOC_LITERAL(58, 760, 7), // "purpose"
+QT_MOC_LITERAL(59, 768, 7), // "pubCoin"
+QT_MOC_LITERAL(60, 776, 6), // "isUsed"
+QT_MOC_LITERAL(61, 783, 19), // "updateWatchOnlyFlag"
+QT_MOC_LITERAL(62, 803, 18), // "updateMultiSigFlag"
+QT_MOC_LITERAL(63, 822, 18), // "pollBalanceChanged"
+QT_MOC_LITERAL(64, 841, 18), // "emitBalanceChanged"
+QT_MOC_LITERAL(65, 860, 18), // "updateContractBook"
+QT_MOC_LITERAL(66, 879, 3), // "abi"
+QT_MOC_LITERAL(67, 883, 21), // "checkForInvalidTokens"
+QT_MOC_LITERAL(68, 905, 11), // "backupCheck"
+QT_MOC_LITERAL(69, 917, 16), // "getTxDescription"
+QT_MOC_LITERAL(70, 934, 3), // "row"
+QT_MOC_LITERAL(71, 938, 11), // "caculateSum"
+QT_MOC_LITERAL(72, 950, 4), // "rows"
+QT_MOC_LITERAL(73, 955, 13), // "exportClicked"
+QT_MOC_LITERAL(74, 969, 10), // "chooseType"
+QT_MOC_LITERAL(75, 980, 3), // "idx"
+QT_MOC_LITERAL(76, 984, 10), // "chooseDate"
+QT_MOC_LITERAL(77, 995, 16), // "dateRangeChanged"
+QT_MOC_LITERAL(78, 1012, 8), // "fromDate"
+QT_MOC_LITERAL(79, 1021, 6), // "toDate"
+QT_MOC_LITERAL(80, 1028, 13), // "changedPrefix"
+QT_MOC_LITERAL(81, 1042, 6), // "prefix"
+QT_MOC_LITERAL(82, 1049, 13), // "changedAmount"
+QT_MOC_LITERAL(83, 1063, 6), // "amount"
+QT_MOC_LITERAL(84, 1070, 14), // "getlockedCoins"
+QT_MOC_LITERAL(85, 1085, 12), // "GetAllProfit"
+QT_MOC_LITERAL(86, 1098, 9), // "getNodeID"
+QT_MOC_LITERAL(87, 1108, 20), // "GetRedeemDescription"
+QT_MOC_LITERAL(88, 1129, 13), // "GetRedeemTXID"
+QT_MOC_LITERAL(89, 1143, 14), // "GetEntrustSure"
+QT_MOC_LITERAL(90, 1158, 6), // "nodeID"
+QT_MOC_LITERAL(91, 1165, 6), // "number"
+QT_MOC_LITERAL(92, 1172, 4), // "uint"
+QT_MOC_LITERAL(93, 1177, 15), // "RedeemOperation"
+QT_MOC_LITERAL(94, 1193, 4), // "txid"
+QT_MOC_LITERAL(95, 1198, 16), // "EntrustOperation"
+QT_MOC_LITERAL(96, 1215, 6), // "nodeid"
+QT_MOC_LITERAL(97, 1222, 22), // "SendAdvertiseOperation"
+QT_MOC_LITERAL(98, 1245, 10), // "GetMessage"
+QT_MOC_LITERAL(99, 1256, 11), // "InitEntrust"
+QT_MOC_LITERAL(100, 1268, 17), // "GetMyAgentUserNum"
+QT_MOC_LITERAL(101, 1286, 14), // "GetMyUTXOCount"
+QT_MOC_LITERAL(102, 1301, 17), // "GetMyAgentEntrust"
+QT_MOC_LITERAL(103, 1319, 18), // "GetDopsStateString"
+QT_MOC_LITERAL(104, 1338, 14), // "GetStakingStat"
+QT_MOC_LITERAL(105, 1353, 21), // "GetMyMasternodeStatus"
+QT_MOC_LITERAL(106, 1375, 18), // "UpdateMainNodeList"
+QT_MOC_LITERAL(107, 1394, 12), // "formatAmount"
+QT_MOC_LITERAL(108, 1407, 4), // "unit"
+QT_MOC_LITERAL(109, 1412, 9), // "getAmount"
+QT_MOC_LITERAL(110, 1422, 11), // "currentUnit"
+QT_MOC_LITERAL(111, 1434, 9), // "direction"
+QT_MOC_LITERAL(112, 1444, 6), // "factor"
+QT_MOC_LITERAL(113, 1451, 12), // "getClipBoard"
+QT_MOC_LITERAL(114, 1464, 4), // "type"
+QT_MOC_LITERAL(115, 1469, 12), // "setClipBoard"
+QT_MOC_LITERAL(116, 1482, 7), // "variant"
+QT_MOC_LITERAL(117, 1490, 13), // "getFeePerkilo"
+QT_MOC_LITERAL(118, 1504, 13), // "alreadyShowed"
+QT_MOC_LITERAL(119, 1518, 7), // "version"
+QT_MOC_LITERAL(120, 1526, 14), // "getFieldAmount"
+QT_MOC_LITERAL(121, 1541, 10), // "amountText"
+QT_MOC_LITERAL(122, 1552, 17), // "addAddressByWords"
+QT_MOC_LITERAL(123, 1570, 10), // "addressStr"
+QT_MOC_LITERAL(124, 1581, 12), // "rescanWallet"
+QT_MOC_LITERAL(125, 1594, 15), // "validateAddress"
+QT_MOC_LITERAL(126, 1610, 14), // "validateAmount"
+QT_MOC_LITERAL(127, 1625, 15), // "sendtoAddresses"
+QT_MOC_LITERAL(128, 1641, 9), // "getReadMe"
+QT_MOC_LITERAL(129, 1651, 9), // "isTestNet"
+QT_MOC_LITERAL(130, 1661, 19), // "getEncryptionStatus"
+QT_MOC_LITERAL(131, 1681, 18), // "setWalletEncrypted"
+QT_MOC_LITERAL(132, 1700, 7), // "passStr"
+QT_MOC_LITERAL(133, 1708, 16), // "changePassphrase"
+QT_MOC_LITERAL(134, 1725, 10), // "oldPassStr"
+QT_MOC_LITERAL(135, 1736, 10), // "newPassStr"
+QT_MOC_LITERAL(136, 1747, 15), // "setWalletLocked"
+QT_MOC_LITERAL(137, 1763, 6), // "locked"
+QT_MOC_LITERAL(138, 1770, 13), // "anonymizeOnly"
+QT_MOC_LITERAL(139, 1784, 12), // "backupWallet"
+QT_MOC_LITERAL(140, 1797, 8), // "filename"
+QT_MOC_LITERAL(141, 1806, 17), // "checkBackupStatus"
+QT_MOC_LITERAL(142, 1824, 28), // "UpdateNotificationRecordList"
+QT_MOC_LITERAL(143, 1853, 4), // "from"
+QT_MOC_LITERAL(144, 1858, 5), // "count"
+QT_MOC_LITERAL(145, 1864, 24), // "HaveNotificationNextPage"
+QT_MOC_LITERAL(146, 1889, 21), // "GetNotificationRecord"
+QT_MOC_LITERAL(147, 1911, 20), // "GetNotificationTitle"
+QT_MOC_LITERAL(148, 1932, 21), // "GetEntructDescription"
+QT_MOC_LITERAL(149, 1954, 21), // "GetDepriveDescription"
+QT_MOC_LITERAL(150, 1976, 25), // "notificationRecords_Proxy"
+QT_MOC_LITERAL(151, 2002, 22), // "NotificationListProxy*"
+QT_MOC_LITERAL(152, 2025, 19), // "redeemRecords_Proxy"
+QT_MOC_LITERAL(153, 2045, 23), // "EntrustRecordListProxy*"
+QT_MOC_LITERAL(154, 2069, 20), // "entrustRecords_Proxy"
+QT_MOC_LITERAL(155, 2090, 14), // "nodeList_Proxy"
+QT_MOC_LITERAL(156, 2105, 21), // "EntrustNodeListProxy*"
+QT_MOC_LITERAL(157, 2127, 18), // "mainNodeList_Proxy"
+QT_MOC_LITERAL(158, 2146, 18), // "MainNodeListProxy*"
+QT_MOC_LITERAL(159, 2165, 22), // "transaction_ProxyModel"
+QT_MOC_LITERAL(160, 2188, 23), // "TransactionFilterProxy*"
+QT_MOC_LITERAL(161, 2212, 10), // "syncStatus"
+QT_MOC_LITERAL(162, 2223, 30), // "transaction_ProxyModelOverView"
+QT_MOC_LITERAL(163, 2254, 26), // "receivingAddressProxyModel"
+QT_MOC_LITERAL(164, 2281, 19), // "AddressFilterProxy*"
+QT_MOC_LITERAL(165, 2301, 24), // "sendingAddressProxyModel"
+QT_MOC_LITERAL(166, 2326, 25), // "recentRequestsFilterProxy"
+QT_MOC_LITERAL(167, 2352, 26), // "RecentRequestsFilterProxy*"
+QT_MOC_LITERAL(168, 2379, 19), // "contractfilterproxy"
+QT_MOC_LITERAL(169, 2399, 20), // "ContractFilterProxy*"
+QT_MOC_LITERAL(170, 2420, 12), // "contractPage"
+QT_MOC_LITERAL(171, 2433, 19), // "CreateContractPage*"
+QT_MOC_LITERAL(172, 2453, 16), // "tokenfilterproxy"
+QT_MOC_LITERAL(173, 2470, 17), // "TokenFilterProxy*"
+QT_MOC_LITERAL(174, 2488, 14), // "tokenItemModel"
+QT_MOC_LITERAL(175, 2503, 15), // "TokenItemModel*"
+QT_MOC_LITERAL(176, 2519, 16), // "coinControlProxy"
+QT_MOC_LITERAL(177, 2536, 17), // "CoinControlProxy*"
+QT_MOC_LITERAL(178, 2554, 20), // "masternodetableproxy"
+QT_MOC_LITERAL(179, 2575, 21) // "MasterNodeTableProxy*"
 
     },
     "WalletModel\0balanceChanged\0\0CAmount\0"
@@ -228,7 +231,8 @@ QT_MOC_LITERAL(176, 2510, 21) // "MasterNodeTableProxy*"
     "fHaveWatchonly\0notifyMultiSigChanged\0"
     "fHaveMultiSig\0pollBalanceChanged_sig\0"
     "traySignal\0badWords\0existingAddress\0"
-    "addAddressSuccessful\0address\0updateStatus\0"
+    "addAddressSuccessful\0address\0"
+    "addTokenEntryEmit\0updateStatus\0"
     "updateTransaction\0updateAddressBook\0"
     "label\0isMine\0purpose\0pubCoin\0isUsed\0"
     "updateWatchOnlyFlag\0updateMultiSigFlag\0"
@@ -260,8 +264,9 @@ QT_MOC_LITERAL(176, 2510, 21) // "MasterNodeTableProxy*"
     "locked\0anonymizeOnly\0backupWallet\0"
     "filename\0checkBackupStatus\0"
     "UpdateNotificationRecordList\0from\0"
-    "count\0GetNotificationRecord\0"
-    "GetNotificationTitle\0GetEntructDescription\0"
+    "count\0HaveNotificationNextPage\0"
+    "GetNotificationRecord\0GetNotificationTitle\0"
+    "GetEntructDescription\0GetDepriveDescription\0"
     "notificationRecords_Proxy\0"
     "NotificationListProxy*\0redeemRecords_Proxy\0"
     "EntrustRecordListProxy*\0entrustRecords_Proxy\0"
@@ -288,101 +293,104 @@ static const uint qt_meta_data_WalletModel[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      83,   14, // methods
-      17,  724, // properties
+      86,   14, // methods
+      17,  750, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-      18,       // signalCount
+      19,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,   10,  429,    2, 0x06 /* Public */,
-      14,    3,  450,    2, 0x06 /* Public */,
-      17,    1,  457,    2, 0x06 /* Public */,
-      19,    8,  460,    2, 0x06 /* Public */,
-      28,    0,  477,    2, 0x06 /* Public */,
-      29,    0,  478,    2, 0x06 /* Public */,
-      30,    0,  479,    2, 0x06 /* Public */,
-      31,    0,  480,    2, 0x06 /* Public */,
-      32,    3,  481,    2, 0x06 /* Public */,
-      34,    3,  488,    2, 0x06 /* Public */,
-      40,    2,  495,    2, 0x06 /* Public */,
-      42,    1,  500,    2, 0x06 /* Public */,
-      44,    1,  503,    2, 0x06 /* Public */,
-      46,    0,  506,    2, 0x06 /* Public */,
-      47,    1,  507,    2, 0x06 /* Public */,
-      48,    0,  510,    2, 0x06 /* Public */,
-      49,    0,  511,    2, 0x06 /* Public */,
-      50,    1,  512,    2, 0x06 /* Public */,
+       1,   10,  444,    2, 0x06 /* Public */,
+      14,    3,  465,    2, 0x06 /* Public */,
+      17,    1,  472,    2, 0x06 /* Public */,
+      19,    8,  475,    2, 0x06 /* Public */,
+      28,    0,  492,    2, 0x06 /* Public */,
+      29,    0,  493,    2, 0x06 /* Public */,
+      30,    0,  494,    2, 0x06 /* Public */,
+      31,    0,  495,    2, 0x06 /* Public */,
+      32,    3,  496,    2, 0x06 /* Public */,
+      34,    3,  503,    2, 0x06 /* Public */,
+      40,    2,  510,    2, 0x06 /* Public */,
+      42,    1,  515,    2, 0x06 /* Public */,
+      44,    1,  518,    2, 0x06 /* Public */,
+      46,    0,  521,    2, 0x06 /* Public */,
+      47,    1,  522,    2, 0x06 /* Public */,
+      48,    0,  525,    2, 0x06 /* Public */,
+      49,    0,  526,    2, 0x06 /* Public */,
+      50,    1,  527,    2, 0x06 /* Public */,
+      52,    0,  530,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      52,    0,  515,    2, 0x0a /* Public */,
-      53,    0,  516,    2, 0x0a /* Public */,
-      54,    5,  517,    2, 0x0a /* Public */,
-      54,    3,  528,    2, 0x0a /* Public */,
-      60,    1,  535,    2, 0x0a /* Public */,
-      61,    1,  538,    2, 0x0a /* Public */,
-      62,    0,  541,    2, 0x0a /* Public */,
-      63,    0,  542,    2, 0x0a /* Public */,
-      64,    4,  543,    2, 0x0a /* Public */,
-      66,    0,  552,    2, 0x08 /* Private */,
-      67,    0,  553,    2, 0x08 /* Private */,
+      53,    0,  531,    2, 0x0a /* Public */,
+      54,    0,  532,    2, 0x0a /* Public */,
+      55,    5,  533,    2, 0x0a /* Public */,
+      55,    3,  544,    2, 0x0a /* Public */,
+      61,    1,  551,    2, 0x0a /* Public */,
+      62,    1,  554,    2, 0x0a /* Public */,
+      63,    0,  557,    2, 0x0a /* Public */,
+      64,    0,  558,    2, 0x0a /* Public */,
+      65,    4,  559,    2, 0x0a /* Public */,
+      67,    0,  568,    2, 0x08 /* Private */,
+      68,    0,  569,    2, 0x08 /* Private */,
 
  // methods: name, argc, parameters, tag, flags
-      68,    1,  554,    2, 0x02 /* Public */,
-      70,    1,  557,    2, 0x02 /* Public */,
-      72,    0,  560,    2, 0x02 /* Public */,
-      73,    1,  561,    2, 0x02 /* Public */,
-      75,    1,  564,    2, 0x02 /* Public */,
-      76,    2,  567,    2, 0x02 /* Public */,
-      79,    1,  572,    2, 0x02 /* Public */,
-      81,    1,  575,    2, 0x02 /* Public */,
-      83,    0,  578,    2, 0x02 /* Public */,
-      84,    0,  579,    2, 0x02 /* Public */,
-      85,    1,  580,    2, 0x02 /* Public */,
-      86,    1,  583,    2, 0x02 /* Public */,
-      87,    1,  586,    2, 0x02 /* Public */,
-      88,    3,  589,    2, 0x02 /* Public */,
-      92,    1,  596,    2, 0x02 /* Public */,
-      94,    3,  599,    2, 0x02 /* Public */,
-      96,    3,  606,    2, 0x02 /* Public */,
-      97,    0,  613,    2, 0x02 /* Public */,
-      98,    0,  614,    2, 0x02 /* Public */,
-      99,    0,  615,    2, 0x02 /* Public */,
-     100,    0,  616,    2, 0x02 /* Public */,
-     101,    0,  617,    2, 0x02 /* Public */,
-     102,    0,  618,    2, 0x02 /* Public */,
-     103,    0,  619,    2, 0x02 /* Public */,
-     104,    0,  620,    2, 0x02 /* Public */,
-     105,    0,  621,    2, 0x02 /* Public */,
-     106,    2,  622,    2, 0x02 /* Public */,
-     106,    1,  627,    2, 0x22 /* Public | MethodCloned */,
-     108,    5,  630,    2, 0x02 /* Public */,
-     108,    4,  641,    2, 0x22 /* Public | MethodCloned */,
-     112,    1,  650,    2, 0x02 /* Public */,
-     114,    1,  653,    2, 0x02 /* Public */,
-     116,    0,  656,    2, 0x02 /* Public */,
-     117,    1,  657,    2, 0x02 /* Public */,
-     119,    2,  660,    2, 0x02 /* Public */,
-     121,    1,  665,    2, 0x02 /* Public */,
-     123,    0,  668,    2, 0x02 /* Public */,
-     124,    1,  669,    2, 0x02 /* Public */,
-     125,    2,  672,    2, 0x02 /* Public */,
-     126,    0,  677,    2, 0x02 /* Public */,
-     127,    0,  678,    2, 0x02 /* Public */,
-     128,    0,  679,    2, 0x02 /* Public */,
-     129,    0,  680,    2, 0x02 /* Public */,
-     130,    1,  681,    2, 0x02 /* Public */,
-     132,    2,  684,    2, 0x02 /* Public */,
-     135,    3,  689,    2, 0x02 /* Public */,
-     135,    2,  696,    2, 0x22 /* Public | MethodCloned */,
-     135,    1,  701,    2, 0x22 /* Public | MethodCloned */,
-     138,    1,  704,    2, 0x02 /* Public */,
-     140,    0,  707,    2, 0x02 /* Public */,
-     141,    3,  708,    2, 0x02 /* Public */,
-     144,    1,  715,    2, 0x02 /* Public */,
-     145,    1,  718,    2, 0x02 /* Public */,
-     146,    1,  721,    2, 0x02 /* Public */,
+      69,    1,  570,    2, 0x02 /* Public */,
+      71,    1,  573,    2, 0x02 /* Public */,
+      73,    0,  576,    2, 0x02 /* Public */,
+      74,    1,  577,    2, 0x02 /* Public */,
+      76,    1,  580,    2, 0x02 /* Public */,
+      77,    2,  583,    2, 0x02 /* Public */,
+      80,    1,  588,    2, 0x02 /* Public */,
+      82,    1,  591,    2, 0x02 /* Public */,
+      84,    0,  594,    2, 0x02 /* Public */,
+      85,    0,  595,    2, 0x02 /* Public */,
+      86,    1,  596,    2, 0x02 /* Public */,
+      87,    1,  599,    2, 0x02 /* Public */,
+      88,    1,  602,    2, 0x02 /* Public */,
+      89,    3,  605,    2, 0x02 /* Public */,
+      93,    1,  612,    2, 0x02 /* Public */,
+      95,    3,  615,    2, 0x02 /* Public */,
+      97,    3,  622,    2, 0x02 /* Public */,
+      98,    0,  629,    2, 0x02 /* Public */,
+      99,    0,  630,    2, 0x02 /* Public */,
+     100,    0,  631,    2, 0x02 /* Public */,
+     101,    0,  632,    2, 0x02 /* Public */,
+     102,    0,  633,    2, 0x02 /* Public */,
+     103,    0,  634,    2, 0x02 /* Public */,
+     104,    0,  635,    2, 0x02 /* Public */,
+     105,    0,  636,    2, 0x02 /* Public */,
+     106,    0,  637,    2, 0x02 /* Public */,
+     107,    2,  638,    2, 0x02 /* Public */,
+     107,    1,  643,    2, 0x22 /* Public | MethodCloned */,
+     109,    5,  646,    2, 0x02 /* Public */,
+     109,    4,  657,    2, 0x22 /* Public | MethodCloned */,
+     113,    1,  666,    2, 0x02 /* Public */,
+     115,    1,  669,    2, 0x02 /* Public */,
+     117,    0,  672,    2, 0x02 /* Public */,
+     118,    1,  673,    2, 0x02 /* Public */,
+     120,    2,  676,    2, 0x02 /* Public */,
+     122,    1,  681,    2, 0x02 /* Public */,
+     124,    0,  684,    2, 0x02 /* Public */,
+     125,    1,  685,    2, 0x02 /* Public */,
+     126,    2,  688,    2, 0x02 /* Public */,
+     127,    0,  693,    2, 0x02 /* Public */,
+     128,    0,  694,    2, 0x02 /* Public */,
+     129,    0,  695,    2, 0x02 /* Public */,
+     130,    0,  696,    2, 0x02 /* Public */,
+     131,    1,  697,    2, 0x02 /* Public */,
+     133,    2,  700,    2, 0x02 /* Public */,
+     136,    3,  705,    2, 0x02 /* Public */,
+     136,    2,  712,    2, 0x22 /* Public | MethodCloned */,
+     136,    1,  717,    2, 0x22 /* Public | MethodCloned */,
+     139,    1,  720,    2, 0x02 /* Public */,
+     141,    0,  723,    2, 0x02 /* Public */,
+     142,    3,  724,    2, 0x02 /* Public */,
+     145,    3,  731,    2, 0x02 /* Public */,
+     146,    1,  738,    2, 0x02 /* Public */,
+     147,    1,  741,    2, 0x02 /* Public */,
+     148,    1,  744,    2, 0x02 /* Public */,
+     149,    1,  747,    2, 0x02 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3, 0x80000000 | 3,    4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
@@ -403,37 +411,38 @@ static const uint qt_meta_data_WalletModel[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,   51,
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Bool, QMetaType::QString, QMetaType::Int,   51,   55,   56,   57,   18,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Int,   58,   59,   18,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Bool, QMetaType::QString, QMetaType::Int,   51,   56,   57,   58,   18,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::Int,   59,   60,   18,
     QMetaType::Void, QMetaType::Bool,   43,
     QMetaType::Void, QMetaType::Bool,   45,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Int,   51,   55,   65,   18,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Int,   51,   56,   66,   18,
     QMetaType::Void,
     QMetaType::Void,
 
  // methods: parameters
-    QMetaType::QString, QMetaType::Int,   69,
-    QMetaType::QString, QMetaType::QVariantList,   71,
+    QMetaType::QString, QMetaType::Int,   70,
+    QMetaType::QString, QMetaType::QVariantList,   72,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   74,
-    QMetaType::Void, QMetaType::Int,   74,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString,   77,   78,
-    QMetaType::Void, QMetaType::QString,   80,
-    QMetaType::Void, QMetaType::QString,   82,
+    QMetaType::Void, QMetaType::Int,   75,
+    QMetaType::Void, QMetaType::Int,   75,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString,   78,   79,
+    QMetaType::Void, QMetaType::QString,   81,
+    QMetaType::Void, QMetaType::QString,   83,
     QMetaType::LongLong,
     0x80000000 | 3,
-    QMetaType::QString, QMetaType::Int,   69,
-    QMetaType::QString, QMetaType::Int,   69,
-    QMetaType::QString, QMetaType::Int,   69,
-    QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString,   89,   90,   91,
-    QMetaType::Bool, QMetaType::QString,   93,
-    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::Int,   95,   82,   91,
+    QMetaType::QString, QMetaType::Int,   70,
+    QMetaType::QString, QMetaType::Int,   70,
+    QMetaType::QString, QMetaType::Int,   70,
+    QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString,   90,   91,   92,
+    QMetaType::Bool, QMetaType::QString,   94,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::Int,   96,   83,   92,
     QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString,   21,   25,   23,
     QMetaType::QString,
     QMetaType::Void,
@@ -444,53 +453,55 @@ static const uint qt_meta_data_WalletModel[] = {
     QMetaType::Bool,
     QMetaType::Bool,
     QMetaType::Void,
-    QMetaType::QString, QMetaType::LongLong, QMetaType::Int,   82,  107,
-    QMetaType::QString, QMetaType::LongLong,   82,
-    QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::Int, QMetaType::Int,  109,  107,   23,  110,  111,
-    QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::Int,  109,  107,   23,  110,
-    QMetaType::QVariant, QMetaType::QString,  113,
-    QMetaType::Void, QMetaType::QVariant,  115,
+    QMetaType::QString, QMetaType::LongLong, QMetaType::Int,   83,  108,
+    QMetaType::QString, QMetaType::LongLong,   83,
+    QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::Int, QMetaType::Int,  110,  108,   23,  111,  112,
+    QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::Int,  110,  108,   23,  111,
+    QMetaType::QVariant, QMetaType::QString,  114,
+    QMetaType::Void, QMetaType::QVariant,  116,
     QMetaType::LongLong,
-    QMetaType::Bool, QMetaType::QString,  118,
-    QMetaType::LongLong, QMetaType::Int, QMetaType::QString,   91,  120,
-    QMetaType::Void, QMetaType::QString,  122,
+    QMetaType::Bool, QMetaType::QString,  119,
+    QMetaType::LongLong, QMetaType::Int, QMetaType::QString,   92,  121,
+    QMetaType::Void, QMetaType::QString,  123,
     QMetaType::Void,
     QMetaType::Bool, QMetaType::QString,   51,
-    QMetaType::LongLong, QMetaType::Int, QMetaType::QString,  109,   23,
+    QMetaType::LongLong, QMetaType::Int, QMetaType::QString,  110,   23,
     QMetaType::Void,
     QMetaType::QString,
     QMetaType::Bool,
     QMetaType::Int,
-    QMetaType::Bool, QMetaType::QString,  131,
-    QMetaType::Bool, QMetaType::QString, QMetaType::QString,  133,  134,
-    QMetaType::Bool, QMetaType::Bool, QMetaType::QString, QMetaType::Bool,  136,  131,  137,
-    QMetaType::Bool, QMetaType::Bool, QMetaType::QString,  136,  131,
-    QMetaType::Bool, QMetaType::Bool,  136,
-    QMetaType::Bool, QMetaType::QString,  139,
+    QMetaType::Bool, QMetaType::QString,  132,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString,  134,  135,
+    QMetaType::Bool, QMetaType::Bool, QMetaType::QString, QMetaType::Bool,  137,  132,  138,
+    QMetaType::Bool, QMetaType::Bool, QMetaType::QString,  137,  132,
+    QMetaType::Bool, QMetaType::Bool,  137,
+    QMetaType::Bool, QMetaType::QString,  140,
     QMetaType::Bool,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int,  113,  142,  143,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int,  114,  143,  144,
+    QMetaType::Bool, QMetaType::Int, QMetaType::Int, QMetaType::Int,  114,  143,  144,
     QMetaType::QString, QMetaType::Int,   20,
     QMetaType::QString, QMetaType::Int,   20,
-    QMetaType::QString, QMetaType::Int,   69,
+    QMetaType::QString, QMetaType::Int,   70,
+    QMetaType::QString, QMetaType::Int,   70,
 
  // properties: name, type, flags
-     147, 0x80000000 | 148, 0x00095409,
-     149, 0x80000000 | 150, 0x00095409,
-     151, 0x80000000 | 150, 0x00095409,
+     150, 0x80000000 | 151, 0x00095409,
      152, 0x80000000 | 153, 0x00095409,
-     154, 0x80000000 | 155, 0x00095409,
-     156, 0x80000000 | 157, 0x00095409,
-     158, QMetaType::QString, 0x00495003,
-     159, 0x80000000 | 157, 0x00095409,
-     160, 0x80000000 | 161, 0x00095409,
-     162, 0x80000000 | 161, 0x00095409,
+     154, 0x80000000 | 153, 0x00095409,
+     155, 0x80000000 | 156, 0x00095409,
+     157, 0x80000000 | 158, 0x00095409,
+     159, 0x80000000 | 160, 0x00095409,
+     161, QMetaType::QString, 0x00495003,
+     162, 0x80000000 | 160, 0x00095409,
      163, 0x80000000 | 164, 0x00095409,
-     165, 0x80000000 | 166, 0x00095409,
-     167, 0x80000000 | 168, 0x00095409,
-     169, 0x80000000 | 170, 0x00095409,
-     171, 0x80000000 | 172, 0x00095409,
-     173, 0x80000000 | 174, 0x00095409,
-     175, 0x80000000 | 176, 0x00095409,
+     165, 0x80000000 | 164, 0x00095409,
+     166, 0x80000000 | 167, 0x00095409,
+     168, 0x80000000 | 169, 0x00095409,
+     170, 0x80000000 | 171, 0x00095409,
+     172, 0x80000000 | 173, 0x00095409,
+     174, 0x80000000 | 175, 0x00095409,
+     176, 0x80000000 | 177, 0x00095409,
+     178, 0x80000000 | 179, 0x00095409,
 
  // properties: notify_signal_id
        0,
@@ -538,111 +549,116 @@ void WalletModel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 15: _t->badWords(); break;
         case 16: _t->existingAddress(); break;
         case 17: _t->addAddressSuccessful((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 18: _t->updateStatus(); break;
-        case 19: _t->updateTransaction(); break;
-        case 20: _t->updateAddressBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< bool(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
-        case 21: _t->updateAddressBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3]))); break;
-        case 22: _t->updateWatchOnlyFlag((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 23: _t->updateMultiSigFlag((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 24: _t->pollBalanceChanged(); break;
-        case 25: _t->emitBalanceChanged(); break;
-        case 26: _t->updateContractBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
-        case 27: _t->checkForInvalidTokens(); break;
-        case 28: _t->backupCheck(); break;
-        case 29: { QString _r = _t->getTxDescription((*reinterpret_cast< int(*)>(_a[1])));
+        case 18: _t->addTokenEntryEmit(); break;
+        case 19: _t->updateStatus(); break;
+        case 20: _t->updateTransaction(); break;
+        case 21: _t->updateAddressBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< bool(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 22: _t->updateAddressBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3]))); break;
+        case 23: _t->updateWatchOnlyFlag((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 24: _t->updateMultiSigFlag((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 25: _t->pollBalanceChanged(); break;
+        case 26: _t->emitBalanceChanged(); break;
+        case 27: _t->updateContractBook((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
+        case 28: _t->checkForInvalidTokens(); break;
+        case 29: _t->backupCheck(); break;
+        case 30: { QString _r = _t->getTxDescription((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 30: { QString _r = _t->caculateSum((*reinterpret_cast< QVariantList(*)>(_a[1])));
+        case 31: { QString _r = _t->caculateSum((*reinterpret_cast< QVariantList(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 31: _t->exportClicked(); break;
-        case 32: _t->chooseType((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 33: _t->chooseDate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 34: _t->dateRangeChanged((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
-        case 35: _t->changedPrefix((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 36: _t->changedAmount((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 37: { qint64 _r = _t->getlockedCoins();
+        case 32: _t->exportClicked(); break;
+        case 33: _t->chooseType((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 34: _t->chooseDate((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 35: _t->dateRangeChanged((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 36: _t->changedPrefix((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 37: _t->changedAmount((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 38: { qint64 _r = _t->getlockedCoins();
             if (_a[0]) *reinterpret_cast< qint64*>(_a[0]) = std::move(_r); }  break;
-        case 38: { CAmount _r = _t->GetAllProfit();
+        case 39: { CAmount _r = _t->GetAllProfit();
             if (_a[0]) *reinterpret_cast< CAmount*>(_a[0]) = std::move(_r); }  break;
-        case 39: { QString _r = _t->getNodeID((*reinterpret_cast< int(*)>(_a[1])));
+        case 40: { QString _r = _t->getNodeID((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 40: { QString _r = _t->GetRedeemDescription((*reinterpret_cast< int(*)>(_a[1])));
+        case 41: { QString _r = _t->GetRedeemDescription((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 41: { QString _r = _t->GetRedeemTXID((*reinterpret_cast< int(*)>(_a[1])));
+        case 42: { QString _r = _t->GetRedeemTXID((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 42: { QString _r = _t->GetEntrustSure((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])));
+        case 43: { QString _r = _t->GetEntrustSure((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 43: { bool _r = _t->RedeemOperation((*reinterpret_cast< QString(*)>(_a[1])));
+        case 44: { bool _r = _t->RedeemOperation((*reinterpret_cast< QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 44: { bool _r = _t->EntrustOperation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+        case 45: { bool _r = _t->EntrustOperation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 45: { bool _r = _t->SendAdvertiseOperation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])));
+        case 46: { bool _r = _t->SendAdvertiseOperation((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 46: { QString _r = _t->GetMessage();
+        case 47: { QString _r = _t->GetMessage();
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 47: _t->InitEntrust(); break;
-        case 48: { int _r = _t->GetMyAgentUserNum();
+        case 48: _t->InitEntrust(); break;
+        case 49: { int _r = _t->GetMyAgentUserNum();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 49: { int _r = _t->GetMyUTXOCount();
+        case 50: { int _r = _t->GetMyUTXOCount();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 50: { double _r = _t->GetMyAgentEntrust();
+        case 51: { double _r = _t->GetMyAgentEntrust();
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 51: { QString _r = _t->GetDopsStateString();
+        case 52: { QString _r = _t->GetDopsStateString();
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 52: { bool _r = _t->GetStakingStat();
+        case 53: { bool _r = _t->GetStakingStat();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 53: { bool _r = _t->GetMyMasternodeStatus();
+        case 54: { bool _r = _t->GetMyMasternodeStatus();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 54: _t->UpdateMainNodeList(); break;
-        case 55: { QString _r = _t->formatAmount((*reinterpret_cast< qint64(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+        case 55: _t->UpdateMainNodeList(); break;
+        case 56: { QString _r = _t->formatAmount((*reinterpret_cast< qint64(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 56: { QString _r = _t->formatAmount((*reinterpret_cast< qint64(*)>(_a[1])));
+        case 57: { QString _r = _t->formatAmount((*reinterpret_cast< qint64(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 57: { QString _r = _t->getAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])));
+        case 58: { QString _r = _t->getAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 58: { QString _r = _t->getAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])));
+        case 59: { QString _r = _t->getAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 59: { QVariant _r = _t->getClipBoard((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 60: { QVariant _r = _t->getClipBoard((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariant*>(_a[0]) = std::move(_r); }  break;
-        case 60: _t->setClipBoard((*reinterpret_cast< QVariant(*)>(_a[1]))); break;
-        case 61: { qint64 _r = _t->getFeePerkilo();
+        case 61: _t->setClipBoard((*reinterpret_cast< QVariant(*)>(_a[1]))); break;
+        case 62: { qint64 _r = _t->getFeePerkilo();
             if (_a[0]) *reinterpret_cast< qint64*>(_a[0]) = std::move(_r); }  break;
-        case 62: { bool _r = _t->alreadyShowed((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 63: { bool _r = _t->alreadyShowed((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 63: { qint64 _r = _t->getFieldAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])));
+        case 64: { qint64 _r = _t->getFieldAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< qint64*>(_a[0]) = std::move(_r); }  break;
-        case 64: _t->addAddressByWords((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 65: _t->rescanWallet(); break;
-        case 66: { bool _r = _t->validateAddress((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 65: _t->addAddressByWords((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 66: _t->rescanWallet(); break;
+        case 67: { bool _r = _t->validateAddress((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 67: { qint64 _r = _t->validateAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 68: { qint64 _r = _t->validateAmount((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< qint64*>(_a[0]) = std::move(_r); }  break;
-        case 68: _t->sendtoAddresses(); break;
-        case 69: { QString _r = _t->getReadMe();
+        case 69: _t->sendtoAddresses(); break;
+        case 70: { QString _r = _t->getReadMe();
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 70: { bool _r = _t->isTestNet();
+        case 71: { bool _r = _t->isTestNet();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 71: { int _r = _t->getEncryptionStatus();
+        case 72: { int _r = _t->getEncryptionStatus();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 72: { bool _r = _t->setWalletEncrypted((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 73: { bool _r = _t->setWalletEncrypted((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 73: { bool _r = _t->changePassphrase((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 74: { bool _r = _t->changePassphrase((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 74: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< bool(*)>(_a[3])));
+        case 75: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< bool(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 75: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 76: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 76: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])));
+        case 77: { bool _r = _t->setWalletLocked((*reinterpret_cast< bool(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 77: { bool _r = _t->backupWallet((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 78: { bool _r = _t->backupWallet((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 78: { bool _r = _t->checkBackupStatus();
+        case 79: { bool _r = _t->checkBackupStatus();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 79: _t->UpdateNotificationRecordList((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3]))); break;
-        case 80: { QString _r = _t->GetNotificationRecord((*reinterpret_cast< int(*)>(_a[1])));
+        case 80: _t->UpdateNotificationRecordList((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3]))); break;
+        case 81: { bool _r = _t->HaveNotificationNextPage((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 82: { QString _r = _t->GetNotificationRecord((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 81: { QString _r = _t->GetNotificationTitle((*reinterpret_cast< int(*)>(_a[1])));
+        case 83: { QString _r = _t->GetNotificationTitle((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 82: { QString _r = _t->GetEntructDescription((*reinterpret_cast< int(*)>(_a[1])));
+        case 84: { QString _r = _t->GetEntructDescription((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 85: { QString _r = _t->GetDepriveDescription((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -774,6 +790,13 @@ void WalletModel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
                 return;
             }
         }
+        {
+            typedef void (WalletModel::*_t)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&WalletModel::addTokenEntryEmit)) {
+                *result = 18;
+                return;
+            }
+        }
     } else if (_c == QMetaObject::RegisterPropertyMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
@@ -873,13 +896,13 @@ int WalletModel::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 83)
+        if (_id < 86)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 83;
+        _id -= 86;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 83)
+        if (_id < 86)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 83;
+        _id -= 86;
     }
 #ifndef QT_NO_PROPERTIES
    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
@@ -1018,6 +1041,12 @@ void WalletModel::addAddressSuccessful(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 17, _a);
+}
+
+// SIGNAL 18
+void WalletModel::addTokenEntryEmit()
+{
+    QMetaObject::activate(this, &staticMetaObject, 18, nullptr);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

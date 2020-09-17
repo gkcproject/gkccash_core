@@ -222,6 +222,11 @@ public:
 		return false;
 #endif
 	}
+
+	bool IsFundReward()const
+	{
+		return IsType(Type::FUND_REWARD);
+	}
 	
 	bool IsMasternodeReward()const
 	{

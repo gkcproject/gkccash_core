@@ -4442,7 +4442,7 @@ UniValue resignagent(const UniValue& params, bool fHelp)
 }
 UniValue entrust(const UniValue& params, bool fHelp)
 {
-    if(fHelp || params.size() < 2 || 3 < params.size())
+    if(fHelp || params.size() < 2 || 4 < params.size())
         throw runtime_error(
             "entrust agentid amount\n"
             "\nEntrust an amount to a given agent.\n" +
@@ -4451,6 +4451,7 @@ UniValue entrust(const UniValue& params, bool fHelp)
             "1. \"agentid\"  (string, required) The agentid to entrust to.\n"
             "2. \"amount\"   (numeric, required) The amount in gkc to entrust. eg 0.1\n"
 			"3. \"minutxo\"  (numeric, optional) The amount in gkc to select as inputs. eg 0.01. \n"
+			"4. \"address\"  (string, optional) The gkc address to entrust on. \n"
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
@@ -4480,6 +4481,12 @@ UniValue entrust(const UniValue& params, bool fHelp)
 	CAmount nMinUtxo = 0;
 	if(params.size() >= 3)
 		nMinUtxo = AmountFromValue(params[2]);
+	if(params.size() >= 4) {
+		address.SetString(params[3].get_str());
+		if(!address.IsGKC()){
+			throw JSONRPCError(RPC_INVALID_PARAMETER, "Error: GKC address invalid. ");
+		}
+	}
 	
 	SendMoneyEx(address.Get(), nAmount, wtx, false, nMinUtxo);
 

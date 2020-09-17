@@ -207,6 +207,7 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
 	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Entrust));
 	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Deprive));
 	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::GasRefund));
+	typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::FundReward));
     typeList.push_back( TransactionFilterProxy::TYPE(TransactionRecord::Other));
 
 

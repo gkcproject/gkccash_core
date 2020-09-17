@@ -3820,6 +3820,14 @@ to your wallet!
         <source>Deprive</source>
         <translation>赎回委托</translation>
     </message>
+	<message>
+        <source>GasRefund</source>
+        <translation>Gas退款</translation>
+    </message>
+	<message>
+        <source>FundReward</source>
+        <translation>基金会奖励</translation>
+    </message>
     <message>
         <source>Other</source>
         <translation>其他的</translation>
@@ -3948,6 +3956,14 @@ to your wallet!
 	<message>
         <source>Deprive</source>
         <translation>赎回委托</translation>
+    </message>
+	<message>
+        <source>GasRefund</source>
+        <translation>Gas退款</translation>
+    </message>
+	<message>
+        <source>FundReward</source>
+        <translation>基金会奖励</translation>
     </message>
     <message>
         <source>Contract receive</source>

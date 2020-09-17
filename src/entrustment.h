@@ -65,16 +65,27 @@ namespace dpos
 
 	class UserStatistics {
 	public:
+		enum Version { Default = 1 };
+		int /*Version*/ version;
+		BlockHeight joinHeight;
 		CAmount entrustAmount;
 		CAmount totalDealDivideReward;
 		CAmount totalDividendReward;
 		UserStatistics();
 		UniValue ToUniValue() const;
+		bool OutputTo(ostream&) const;
+		bool InputFrom(istream&);
 	};
 }
+
+ostream& operator<< (ostream&,const dpos::UserStatistics&);
+istream& operator>> (istream&, dpos::UserStatistics&);
+
 class Agent
 {
 public:
+ 	enum Version { Default = 1 	};
+	int /*Version*/ version;
 	AgentID id;
 	std::string name;
 	CAmount receivedTotalAmount; //The total number of all entrusts received by the node
@@ -130,6 +141,10 @@ public:
 	//bool SerializeFor_getagent(CDataStream&) const;
 	size_t MemorySize() const;
 
+	bool SerializeToText(std::ostream&) const;
+	bool UnserializeFromText(std::istream&);
+	bool UnserializeFromTextWithoutVersion(std::istream&);
+
 	friend std::ostream& operator<<(std::ostream&, const Agent&);
 	friend std::istream& operator>>(std::istream&, Agent&);
 };
@@ -169,6 +184,15 @@ typedef std::map<BlockHeight,AgentMap> AgentMapMap;
 
 class Entrustment
 {
+public:
+	enum Version {
+		V1=100,
+		V2=101,
+		V3=102,
+		Default=V3
+	};
+	int /*Version*/ version;
+	
 public:
 	Entrustment();
 
@@ -245,8 +269,6 @@ public:
 	dpos::Blacklist GetSeasonRewardBlacklist(BlockHeight) const;
 
 protected:
-	bool AddAgentTx(BlockHeight, CTransaction&);
-	bool DelAgentTx(BlockHeight, CTransaction&);
 	bool AddEntrust(BlockHeight, CBitcoinAddress, AgentID, CAmount);
 	bool DepriveEntrust(BlockHeight, CBitcoinAddress, AgentID, CAmount);
 

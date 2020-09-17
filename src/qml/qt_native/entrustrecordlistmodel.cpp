@@ -21,9 +21,9 @@ void EntrustRecordListModel::clear()
 }
 
 void  EntrustRecordListModel::minsert(int index, const QString &txid,const double &vout,
-                const QString &agent, const double &amount)
+                const QString &agent, const double &amount,const QString &agentname)
 {
-    EntrustRecord  er(txid, vout,agent,amount);
+    EntrustRecord  er(txid, vout,agent,amount,agentname);
     beginInsertRows(QModelIndex(), index, index);
     entrustRecords.insert(entrustRecords.begin()+index, er);
     endInsertRows();
@@ -35,9 +35,9 @@ void  EntrustRecordListModel::mremove(int index)
     endRemoveRows();
 }
 void EntrustRecordListModel::pushdata(const QString &txid,const double &vout,
-                const QString &agent, const double &amount)
+                const QString &agent, const double &amount,const QString &agentname)
 {
-    EntrustRecord  er(txid, vout,agent,amount);
+    EntrustRecord  er(txid, vout,agent,amount,agentname);
     Add(er);
 }
 int EntrustRecordListModel::rowCount(const QModelIndex &parent) const
@@ -60,7 +60,7 @@ QVariant EntrustRecordListModel::data(const QModelIndex &index, int role)  const
     {
         return er.VOUT();
     }
-    else if (role == Agent)
+    else if (role == AgentHash)
     {
         return er.AGENT();
     }
@@ -68,12 +68,24 @@ QVariant EntrustRecordListModel::data(const QModelIndex &index, int role)  const
     {
         return er.AMOUNT();
     }
+	else if (role == AgentName)
+	{
+		return er.AGENTNAME();
+	}
     else if (role == Operation)
     {
         return er.obj;
     }
     return QVariant();
 }
+
+Agent* EntrustRecordListModel::GetAgentName(AgentID id)
+{
+	BlockHeight height = chainActive.Height();
+	Agent* agent = Entrustment::GetInstance().GetAgent(height,id);
+	return agent;
+}
+
 
 void EntrustRecordListModel::UpdateEntrustRecordList()
 {
@@ -93,10 +105,12 @@ void EntrustRecordListModel::UpdateEntrustRecordList()
 			const CTxOut& txout = tx.vout[output.n];
 			if(pwalletMain->IsMine(txout) && txout.IsEntrusted())
 			{
+				Agent* agent = GetAgentName(tx.agentid);
 				EntrustRecord er(QString::fromStdString(output.hash.GetHex()),
                                 output.n,
                                 QString::fromStdString(tx.agentid.GetHex()),
-                                txout.nValue/1.0e+08);
+                                txout.nValue/1.0e+08,
+                                QString::fromStdString(agent->Name()));
 				totalAmount_ += txout.nValue;
 				Add(er);
 			}
@@ -120,10 +134,12 @@ void EntrustRecordListModel::UpdateRedeemRecordList()
 			const CTxOut& txout = tx.vout[output.n];
 			if(tx.IsDeprive() && pwalletMain->IsMine(txout) && !txout.IsEntrusted())
 			{
+				Agent* agent = GetAgentName(tx.agentid);
 				EntrustRecord er(QString::fromStdString(output.hash.GetHex()),
                                 output.n,
                                 QString::fromStdString(tx.agentid.GetHex()),
-                                txout.nValue/1.0e+08);
+                                txout.nValue/1.0e+08,
+                                QString::fromStdString(agent->Name()));
                 totalAmount_ += txout.nValue;
 				Add(er);
 			}
@@ -133,7 +149,7 @@ void EntrustRecordListModel::UpdateRedeemRecordList()
 
 EntrustRecord EntrustRecordListModel::GetEntrustRecord(int row)
 {
-    EntrustRecord er("",0,"",0);
+    EntrustRecord er("",0,"",0,"");
     if(row<0||row>=entrustRecords.size())
     {
         return er;
@@ -167,6 +183,8 @@ QString EntrustRecordListModel::GetDescription(int row)
     QString html = "";
     html += "<html><font face='verdana, arial, helvetica, sans-serif'>";
     html += "<b>" + tr("NodeID") + ":</b> " + er.AGENT();
+	html += "<b>" + tr("NodeName") + ":</b> " + er.AGENTNAME();
+	html += "<b>" + tr("VoutIndex") + ":</b> " + er.VOUT();
     html += "<br>";
     html += "<b>" + tr("EntrustNumber") + ":</b> " + QString::number(er.AMOUNT()) + "GKC";
     html += "<br>";
@@ -184,6 +202,7 @@ QString EntrustRecordListModel::GetEntructDescription(int row)
     QString html = "";
     html += "<html><font face='verdana, arial, helvetica, sans-serif'>";
     html += "<b>" + tr("NodeID") + ":</b> " + er.AGENT();
+	html += "<b>" + tr("NodeName") + ":</b> " + er.AGENTNAME();
     html += "<br>";
 	html += "<b>" + tr("TxID") + ":</b> " + er.TXID();
     html += "<br>";
@@ -202,6 +221,7 @@ QString EntrustRecordListModel::GetDepriveDescription(int row)
     QString html = "";
     html += "<html><font face='verdana, arial, helvetica, sans-serif'>";
     html += "<b>" + tr("NodeID") + ":</b> " + er.AGENT();
+	html += "<b>" + tr("NodeName") + ":</b> " + er.AGENTNAME();
     html += "<br>";
 	html += "<b>" + tr("TxID") + ":</b> " + er.TXID();
     html += "<br>";
@@ -214,10 +234,11 @@ QString EntrustRecordListModel::GetDepriveDescription(int row)
 QHash<int, QByteArray> EntrustRecordListModel::roleNames() const
 {
     QHash<int, QByteArray>  er;
-    er[Agent] = "agent";
+    er[AgentHash] = "agent";
     er[Amount] = "amount";
     er[TxID] = "txid";
     er[Vout] = "vout";
+	er[AgentName] = "agentname";
     er[Operation] = "operation";
     return  er;
 }

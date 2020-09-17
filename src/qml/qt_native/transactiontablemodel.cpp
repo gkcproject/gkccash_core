@@ -398,6 +398,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Deprive");
 	case TransactionRecord::GasRefund:
 		return tr("GasRefund");
+	case TransactionRecord::FundReward:
+		return tr("FundReward");		
 
     default:
         return "";
@@ -415,6 +417,8 @@ QString TransactionTableModel::txAddressDecoration(const TransactionRecord* wtx)
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::RecvFromOther:
     case TransactionRecord::RecvFromZerocoinSpend:
+	case TransactionRecord::GasRefund:
+	case TransactionRecord::FundReward:
         return "|qrc:/images/icons/tx_input.png";
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
