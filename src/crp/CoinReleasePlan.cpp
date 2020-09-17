@@ -114,7 +114,7 @@ BlockValue CoinReleasePlan::GetBlockValue(Height h) const{
 	else if(InPosHeightRange(h)){
 		const PosPlan& posplan = GetPosPlan(h);
 		Height start = posplan.heightRange.Begin();
-		Height interval = 12*posplan.BlockNumPerMonth();
+		Height interval = 8*posplan.BlockNumPerMonth();
 		v.miner = halve(posplan.standardMinerReward,start,interval,h);
 		v.fund = halve(posplan.standardFundReward,start,interval,h);
 		v.entrust = halve(posplan.standardEntrustReward,start,interval,h);
