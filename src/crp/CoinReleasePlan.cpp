@@ -89,6 +89,15 @@ CoinReleasePlan::CoinReleasePlan(){
 	seasonIntervalHeight         = pos_v1.BlockNumPerMonth();
 	forkheight_seasonIntervalHeight = std::numeric_limits<Height>::max(); // never fork
 	forkheight_posV2 = forkheight_release_v_2_5_1;
+
+	forkheight_posV3 = forkheight_release_v_2_6_0;
+	pos_v3 = pos_v2;
+	pos_v3.standardMinerReward      =     0.48 * COIN;
+	pos_v3.standardEntrustReward    =     5.35 * COIN;
+	pos_v3.standardFundReward       =     4.16 * COIN;
+	pos_v3.standardMasternodeReward =     0.24 * COIN;
+	pos_v3.monthlyTopFirst          = 37160.00 * COIN;
+	pos_v3.monthlyTopSecond         = 37160.00 * COIN;
 }
 
 Height crp::CoinReleasePlan::GetSeasonIntervalHeight(Height chainHeight) const
@@ -130,12 +139,17 @@ BlockValue CoinReleasePlan::GetBlockValue(Height h) const{
 	return v;
 }
 const PosPlan& CoinReleasePlan::GetPosPlan(Height h) const{
-	if(IsPosV2(h))
+	if(IsPosV3(h))
+		return pos_v3;
+	else if(IsPosV2(h))
 		return pos_v2;
 	return pos_v1;
 }
 bool CoinReleasePlan::IsPosV2(Height h) const{
 	return h >= forkheight_posV2;
+}
+bool CoinReleasePlan::IsPosV3(Height h) const{
+	return h >= forkheight_posV3;
 }
 bool CoinReleasePlan::IsSeasonRewardV2(Height h) const {
 	return h >= forkHeightForSeasonRewardV2;

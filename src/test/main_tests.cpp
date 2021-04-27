@@ -6,7 +6,7 @@
 
 #include "primitives/transaction.h"
 #include "main.h"
-
+#include "../forkheights.h"
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(main_tests)
@@ -15,6 +15,18 @@ CAmount nMoneySupplyPoWEnd = 43199500 * COIN;
 
 BOOST_AUTO_TEST_CASE(subsidy_limit_test)
 {
+}
+
+BOOST_AUTO_TEST_CASE(TestGetAdPrice)
+{
+	const BlockHeight forkheight = forkheight_release_v_2_6_0;
+	CAmount price = 0;
+
+	price = advertisement::GetAdPrice(forkheight-1);
+	BOOST_CHECK_EQUAL(price,5*COIN);
+
+	price = advertisement::GetAdPrice(forkheight);
+	BOOST_CHECK_EQUAL(price,50*COIN);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

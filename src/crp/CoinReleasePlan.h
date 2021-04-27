@@ -140,11 +140,13 @@ namespace crp // coin_release_plan
 		PowPlan pow;
 		PosPlan pos_v1;
 		PosPlan pos_v2;
+		PosPlan pos_v3;
 		Height seasonIntervalHeight;
 		
 		Height forkHeightForSeasonRewardV2;
 		Height forkheight_seasonIntervalHeight;
 		Height forkheight_posV2;
+		Height forkheight_posV3;
 
 		Height GetSeasonIntervalHeight(Height chainHeight) const;
 		BlockValue GetBlockValue(Height) const;
@@ -157,6 +159,7 @@ namespace crp // coin_release_plan
 		const PosPlan& GetPosPlan(Height) const;
 	private:
 		bool IsPosV2(Height) const;
+		bool IsPosV3(Height) const;
 	};
 
 	class DistributeRule

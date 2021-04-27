@@ -31,6 +31,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "forkheights.h"
 
 #include "primitives/zerocoin.h"
 #include "libzerocoin/Denominations.h"
@@ -7853,7 +7854,9 @@ std::string CBlockFileInfo::ToString() const
 CAmount advertisement::GetAdPrice(BlockHeight h)
 {
 	CAmount price = 1*COIN;
-	if(h >= Params().forkheight_modifyAdPrice){
+	if (h >= forkheight_release_v_2_6_0) {
+		price = 100*COIN;
+	} else if (h >= Params().forkheight_modifyAdPrice) {
 		price = 10*COIN;
 	}
 	BlockHeight start = crp::CoinReleasePlan::GetInstance().GetPosPlan(h).heightRange.Begin();

@@ -94,4 +94,35 @@ BOOST_AUTO_TEST_CASE(test_DistributeRule_TotalCount) {
 	BOOST_CHECK(rule.TotalCount() == (n1+n2));
 }
 
+
+BOOST_AUTO_TEST_CASE(PosPlanV3) {
+	Height forkheight = 676481;
+	
+	BlockValue bv;
+
+	bv = GetBlockValue(forkheight-1);
+ 	BOOST_CHECK_EQUAL(bv.miner,         1.20 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.fund,          0.35 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.entrust,       6.60 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.masternode,    0.48 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topFirst,  72800.00 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topSecond, 72800.00 *COIN / 2);
+
+	bv = GetBlockValue(forkheight);
+ 	BOOST_CHECK_EQUAL(bv.miner,         0.48 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.entrust,       5.35 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.fund,          4.16 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.masternode,    0.24 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topFirst,  37160.00 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topSecond, 37160.00 *COIN / 2);
+
+	bv = GetBlockValue(forkheight+1);
+ 	BOOST_CHECK_EQUAL(bv.miner,         0.48 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.entrust,       5.35 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.fund,          4.16 *COIN / 2);
+ 	BOOST_CHECK_EQUAL(bv.masternode,    0.24 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topFirst,  37160.00 *COIN / 2);
+//	BOOST_CHECK_EQUAL(bv.topSecond, 37160.00 *COIN / 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
