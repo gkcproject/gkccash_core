@@ -2121,7 +2121,7 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
 				if(forDepriveTx)
 				{
 					
-					if((!txout.IsEntrusted() || tx->IsInDepriveLockingTime(chainActive.Height()))){
+					if((!txout.IsEntrusted() || tx->IsInEntrustLockingTime(chainActive.Height()))){
 						//LogPrint("miner","CWallet::AvailableCoins | txout.IsEntrusted()=%d, chainActive.Height()=%d, %s:%d\n",txout.IsEntrusted(),chainActive.Height(),txid.ToString(),n);
 						continue;
 	               	}
@@ -2884,8 +2884,13 @@ static void PushBackTxOutToTx(CMutableTransaction& txNew, const CTxOut& txOut)
 {
 	CTxOut txout = txOut;
 #ifdef DPOS
-	if(txNew.type==CTransaction::Type::ENTRUST)
-		txout.SetType(CTxOut::Type::ENTRUST);
+	if(txNew.type==CTransaction::Type::ENTRUST) {
+		if (ScriptEx(txout.scriptPubKey).IsComment()) {
+			txout.SetType(CTxOut::Type::DEFAULT);
+		} else {
+			txout.SetType(CTxOut::Type::ENTRUST);
+		}
+	}
 	else if(txNew.type==CTransaction::Type::CREATE_AGENT && txout.nValue > 0)
 		txout.SetType(CTxOut::Type::CREATE_AGENT);
 #endif
@@ -3059,7 +3064,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 if (coinControl && !coinControl->fSplitBlock) {
                     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
                         CTxOut txout(s.second, s.first);
-                        if (txout.IsDust(::minRelayTxFee)) {
+                        if (txout.IsDust(::minRelayTxFee) && !ScriptEx(txout.scriptPubKey).IsComment()) {
                             strFailReason = _("Transaction amount too small");
                             return false;
                         }
@@ -3253,7 +3258,7 @@ bool CWallet::CreateDepriveTransaction(const CWalletTx& entrustTx, CWalletTx& wt
 		return false;
 	}
 
-	if(entrustTx.IsInDepriveLockingTime(chainHeight))
+	if(entrustTx.IsInEntrustLockingTime(chainHeight))
 	{
 		strError = "Entrust tx is locking, deprive again later.";
 		return false;
@@ -5009,18 +5014,15 @@ bool CMerkleTx::IsTransactionLockTimedOut() const
     return false;
 }
 #ifdef DPOS
-bool CWalletTx::IsInDepriveLockingTime(BlockHeight chainHeight) const
+bool CWalletTx::IsInEntrustLockingTime(BlockHeight chainHeight) const
 {
-	int lockHeight = Entrustment::GetInstance().GetLockHeightForDeprive();
+	int lockHeight = Entrustment::GetInstance().GetEntrustTxLockHeight();
 	if(lockHeight <= 0)
 		return false; //not lock
 
-	if(mapBlockIndex.count(hashBlock)==0)
-		return true;
-	
-	int thisHeight = mapBlockIndex[hashBlock]->nHeight;
-	return chainHeight - thisHeight < lockHeight;
+	return dpos::IsEntrustTxLocking(*this,chainHeight,hashBlock);
 }
+
 #endif
 // Given a set of inputs, find the public key that contributes the most coins to the input set
 CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoins)

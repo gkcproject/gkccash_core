@@ -230,7 +230,8 @@ public:
 
 	CAmount GetCreateAgentAmount(BlockHeight blockheight) const;
 	CAmount GetMinEntrustAmount(BlockHeight blockheight) const;
-	BlockHeight GetLockHeightForDeprive() const;
+	BlockHeight GetEntrustTxLockHeight() const;
+	BlockHeight GetEntrustWithCommentTxLockHeight(BlockHeight chainHeight) const;
 	BlockHeight GetDepriveTxLockHeight() const;
 	
 	bool CheckCoinStake(BlockHeight blockheight, const CTransaction& coinstake);
@@ -291,7 +292,8 @@ private:
 	CAmount minEntrustAmount; //Minimum entrust quantity
 	CAmount minDivideReward; //Minimum bonus amount
 	CAmount minDivideReward_v2; //Minimum bonus amount version 2
-	BlockHeight depriveLockHeight;
+	BlockHeight entrustTxLockHeight;
+	BlockHeight entrustWithCommentTxLockHeight;
 	BlockHeight depriveTxLockHeight;
 	BlockHeight baseHeightOffset;
 
@@ -467,6 +469,8 @@ namespace dpos
 	};
 
 	bool WriteDposMetaBlock(const CBlock&, int version);
+
+	bool IsEntrustTxLocking(const CTransaction& tx, int chainHeight, uint256 blockhash);
 }
 
 #endif // ~DPOS

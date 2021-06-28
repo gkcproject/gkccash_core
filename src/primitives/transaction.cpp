@@ -560,6 +560,17 @@ bool CTransaction::IsFilterAd()const
 	}
 	return false;
 }
+bool CTransaction::HasComment()const
+{
+	for (const CTxOut& txout: this->vout) {
+		ScriptEx scriptex(txout.scriptPubKey);
+		if(scriptex.IsComment()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void CTransaction::SetEntrust()
 { 
 	SetType(Type::ENTRUST); 
@@ -658,3 +669,9 @@ std::string CTransaction::ToString() const
         str += "    " + vout[i].ToString() + "\n";
     return str;
 }
+
+bool CTransaction::IsEntrustWithCommentTx() const
+{
+	return IsEntrust() && HasComment();
+}
+

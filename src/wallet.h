@@ -1326,7 +1326,7 @@ public:
     std::set<uint256> GetConflicts() const;
 
 #ifdef DPOS
-	bool IsInDepriveLockingTime(BlockHeight chainHeight) const;
+	bool IsInEntrustLockingTime(BlockHeight chainHeight) const;
 #endif
 };
 

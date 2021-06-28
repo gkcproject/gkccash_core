@@ -1,4 +1,4 @@
-<h1>GKC Release Version 2.6.0</h1>
+<h1>GKC Release Version 2.7.0</h1>
 
 <h4>You are now using release version of GKC. There are several missing functions and bugs already known. If you found any new bugs，or you have any advice, feel free to contact us. Please DO NOT discuss in public. Thanks！</h4>
 
@@ -11,6 +11,9 @@
 <h1>Change Log</h1>
 
 <ul>
+	<h5>v2.7.0</h5>
+	<li>1 Fork(758417), add new type of entrust</li>
+
 	<h5>v2.6.0</h5>
 	<li>1 Fork(676481), modify the allocation proportion of block Award</li>
 	<li>2 Fork(676481), modify advertising fee</li>

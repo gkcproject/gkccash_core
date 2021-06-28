@@ -18,6 +18,7 @@ const time_t crp::MINUTE = 60*SECOND;
 const time_t crp::HOUR = 60*MINUTE;
 const time_t crp::DAY = 24*HOUR;
 const time_t crp::MONTH = 31*DAY;
+const time_t crp::YEAR = 12*MONTH;
 
 BlockValue::BlockValue(){
 	miner = 0;

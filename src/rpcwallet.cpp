@@ -31,6 +31,7 @@
 #include <univalue.h>
 #include "entrustment.h"
 #include "scriptex.h"
+#include "forkheights.h"
 
 using namespace std;
 using namespace boost;
@@ -4493,6 +4494,67 @@ UniValue entrust(const UniValue& params, bool fHelp)
 	LogPrintf("DPOS entrust | return %s\n",wtx.GetHash().GetHex().c_str());
     return wtx.GetHash().GetHex();
 }
+
+UniValue entrustwithcomment(const UniValue& params, bool fHelp)
+{
+    if(fHelp || params.size() < 3 || 5 < params.size())
+        throw runtime_error(
+            "entrustwithcomment agentid amount comment\n"
+            "\nEntrust an amount to a given agent.\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. \"agentid\"  (string, required) The agentid to entrust to.\n"
+            "2. \"amount\"   (numeric, required) The amount in gkc to entrust. eg 0.1\n"
+			"3. \"comment\"	 (string, required) The comment to write to tx output. eg \"sample text\"\n"
+			"4. \"minutxo\"  (numeric, optional) The amount in gkc to select as inputs. eg 0.01. \n"
+			"5. \"address\"  (string, optional) The gkc address to entrust on. \n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("entrustwithcomment", "\"0xac4bc2a311f4e49256ae1270e2b561995f509eb22b1e3f409d18840cda4469e1\" 30 \"0x65e55156517D4c83DaC03D90A7c941956f530F30\""));
+
+	BlockHeight predictHeight = chainActive.Height() + 1;
+	if (predictHeight < forkheight_release_v_2_7_0) {
+		throw JSONRPCError(RPC_INVALID_REQUEST, strprintf("Error: The command is not supported until blockheight %d",forkheight_release_v_2_7_0));
+	}
+
+	uint256 agentid; agentid.SetHex(params[0].get_str());
+    CAmount nAmount = AmountFromValue(params[1]);
+	string comment = params[2].get_str();
+	CAmount nMinUtxo = 0;
+    CBitcoinAddress address(GetAccountAddress(""));
+
+	if(params.size() >= 4)
+		nMinUtxo = AmountFromValue(params[3]);
+
+	if(params.size() >= 5) {
+		address.SetString(params[4].get_str());
+		if(!address.IsGKC()){
+			throw JSONRPCError(RPC_INVALID_PARAMETER, "Error: GKC address invalid. ");
+		}
+	}
+
+	if(!Entrustment::GetInstance().IsAgentIdValid(agentid))
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Error: agentid is invalid. ");
+	
+
+	if(nAmount < Entrustment::GetInstance().GetMinEntrustAmount(predictHeight))
+	{
+        throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Error: Amount too low. min: ") + FormatMoney(Entrustment::GetInstance().GetMinEntrustAmount(predictHeight)));
+	}
+
+    CWalletTx wtx;
+	wtx.SetEntrust();
+	wtx.SetAgentId(agentid);
+	wtx.mapValue["comment"] = comment;
+
+    EnsureWalletIsUnlocked();
+	
+	SendMoneyEx(address.Get(), nAmount, wtx, false, nMinUtxo);
+
+    return wtx.GetHash().GetHex();
+}
+
 UniValue deprive(const UniValue& params, bool fHelp)
 {
     if(fHelp || params.size() != 1)
@@ -4528,6 +4590,19 @@ UniValue getentrustment(const UniValue& params, bool fHelp)
             "\nGet entrustment.\n");
 
 	UniValue result = Entrustment::GetInstance().ToUniValue();
+    return result;
+}
+
+UniValue getentrustlockheight(const UniValue& params, bool fHelp)
+{
+    if(fHelp)
+        throw runtime_error(
+            "getentrustlockheight\n"
+            "\nGet lock heights of entrust tx.\n");
+
+	UniValue result(UniValue::VOBJ);
+	result.push_back(Pair("entrustTx",Entrustment::GetInstance().GetEntrustTxLockHeight()));
+	result.push_back(Pair("entrustWithCommentTx",Entrustment::GetInstance().GetEntrustWithCommentTxLockHeight(chainActive.Height())));
     return result;
 }
 
@@ -4649,6 +4724,27 @@ UniValue listentrusts(const UniValue& params, bool fHelp)
 				o.push_back(Pair("vout", (int)output.n));
 				o.push_back(Pair("agent", tx.agentid.GetHex()));
 				o.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+				int unlockHeight = 0;
+				if (tx.IsEntrustWithCommentTx()) {
+					for (const CTxOut& out: tx.vout) {
+						if (ScriptEx(out.scriptPubKey).IsComment()) {
+							advertisement::TxComment comment;
+							comment.DecodeFrom(out.scriptPubKey);
+							o.push_back(Pair("comment", comment.content));
+							break;
+						}
+					}
+				}
+				if(mapBlockIndex.count(hashBlock) > 0) {
+					int txHeight = mapBlockIndex[hashBlock]->nHeight;
+					int lockHeight = Entrustment::GetInstance().GetEntrustTxLockHeight();
+					if (tx.IsEntrustWithCommentTx()) {
+						lockHeight = Entrustment::GetInstance().GetEntrustWithCommentTxLockHeight(chainActive.Height());
+					}
+					o.push_back(Pair("txHeight", txHeight));
+					o.push_back(Pair("lockHeight", lockHeight));
+					o.push_back(Pair("unlockHeight", txHeight+lockHeight));
+				}
 				outputs.push_back(o);
 				totalAmount += txout.nValue;
 			}

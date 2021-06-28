@@ -380,6 +380,7 @@ static const CRPCCommand vRPCCommands[] =
         {"gkc", "mnsync", &mnsync, true, true, false},
         {"gkc", "spork", &spork, true, true, false},
         {"gkc", "getpoolinfo", &getpoolinfo, true, true, false},
+		{"gkc", "getentrustlockheight", &getentrustlockheight, true, true, false},
 #ifdef ENABLE_WALLET
         {"gkc", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 		{"gkc", "getcrp", &getcrp, false, false, false},
@@ -455,6 +456,7 @@ static const CRPCCommand vRPCCommands[] =
 		{"wallet", "listmyagentid", &listmyagentid, false, false, true},
 		{"wallet", "resignagent", &resignagent, false, false, true},
 		{"wallet", "entrust", &entrust, false, false, true},
+		{"wallet", "entrustwithcomment", &entrustwithcomment, false, false, true},
 		{"wallet", "deprive", &deprive, false, false, true},
 		{"wallet", "getentrustment", &getentrustment, false, false, true},
 		{"wallet", "listagents", &listagents, false, false, true},

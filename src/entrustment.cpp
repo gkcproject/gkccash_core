@@ -290,7 +290,8 @@ Entrustment::Entrustment()
 	minDivideReward = 2 * COIN;
 	minDivideReward_v2 = 1 * COIN;
 	assert(posplan.velocity > 0);
-	depriveLockHeight = 72 * crp::HOUR / posplan.velocity;
+	entrustTxLockHeight = 72 * crp::HOUR / posplan.velocity;
+	entrustWithCommentTxLockHeight = 2 * crp::MONTH / posplan.velocity;
 	depriveTxLockHeight = 24 * crp::HOUR / posplan.velocity;
 	baseHeightOffset = 60;
 	forkHeightForLockMinerRewardReceiver = 34600;
@@ -1025,9 +1026,17 @@ CAmount Entrustment::GetMinEntrustAmount(BlockHeight blockheight) const
 		return 30 * COIN;
 	return minEntrustAmount;
 }
-BlockHeight Entrustment::GetLockHeightForDeprive() const
+
+BlockHeight Entrustment::GetEntrustTxLockHeight() const
 {
-	return depriveLockHeight;
+	return entrustTxLockHeight;
+}
+BlockHeight Entrustment::GetEntrustWithCommentTxLockHeight(BlockHeight chainHeight) const
+{
+	if (chainHeight < forkheight_release_v_2_7_0) {
+		return entrustTxLockHeight;
+	}
+	return entrustWithCommentTxLockHeight;
 }
 BlockHeight Entrustment::GetDepriveTxLockHeight() const
 {
@@ -1290,19 +1299,7 @@ bool Entrustment::IsEntrustTxIsLocking(const uint256& txid, BlockHeight chainHei
 		LogPrintf("Entrustment::IsEntrustTxIsLocking | tx not found | txid=%s, chainHeight=%d\n",txid.ToString(),chainHeight);
 		return true;
 	}
-	if(!mapBlockIndex.count(blockhash))
-	{
-		LogPrintf("Entrustment::IsEntrustTxIsLocking | block not found | txid=%s, chainHeight=%d, blockhash=%s\n",txid.ToString(),chainHeight,blockhash.ToString());
-		return true;
-	}
-	const BlockHeight blockheight = mapBlockIndex[blockhash]->nHeight;
-	const BlockHeight confirm = chainHeight - blockheight;
-	if(confirm < GetLockHeightForDeprive())
-	{
-		LogPrintf("Entrustment::IsEntrustTxIsLocking | confirm not enough | txid=%s, chainHeight=%d, blockhash=%s, blockheight=%d, confirm=%d, lockheight=%d\n",txid.ToString(),chainHeight,blockhash.ToString(),blockheight,confirm,GetLockHeightForDeprive());
-		return true;
-	}
-	return false;
+	return IsEntrustTxLocking(tx, chainHeight, blockhash);
 }
 
 static BlockHeight GetTxHeight(const uint256& txid)
@@ -1390,7 +1387,7 @@ UniValue Entrustment::ToUniValue() const
 	root.push_back(Pair("createAgentAmount",FormatMoney(GetCreateAgentAmount(chainheight))));
 	root.push_back(Pair("minEntrustAmount",FormatMoney(GetMinEntrustAmount(chainheight))));
 	root.push_back(Pair("minDivideReward",FormatMoney(GetMinDivideReward(chainheight))));
-	root.push_back(Pair("depriveLockHeight",depriveLockHeight));
+	root.push_back(Pair("depriveLockHeight",entrustTxLockHeight));
 	root.push_back(Pair("agentMaps.size",agentMaps.size()));
 	root.push_back(Pair("agentMaps",heightMapArray));
 
@@ -2029,4 +2026,21 @@ bool DescBySeasonRewardFactor::Compare(const Agent* a, const Agent* b) const
 	assert(a && b);
 	return a->monthlyCount.reward_factor > b->monthlyCount.reward_factor;
 }
+
+bool dpos::IsEntrustTxLocking(const CTransaction& tx, int chainHeight, uint256 blockhash)
+{
+	if(!mapBlockIndex.count(blockhash)) {
+		return true;
+	}
+	const BlockHeight blockheight = mapBlockIndex[blockhash]->nHeight;
+	const BlockHeight confirm = chainHeight - blockheight;
+	int lockHeight = Entrustment::GetInstance().GetEntrustTxLockHeight();
+	if (chainHeight >= forkheight_release_v_2_7_0 && tx.IsEntrustWithCommentTx()) {
+		int lockHeight2 = Entrustment::GetInstance().GetEntrustWithCommentTxLockHeight(chainHeight);
+		lockHeight = std::max(lockHeight, lockHeight2);
+	}
+	bool locking = (confirm < lockHeight);
+	return locking;
+}
+
 

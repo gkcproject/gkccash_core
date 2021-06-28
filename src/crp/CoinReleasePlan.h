@@ -18,6 +18,7 @@ namespace crp // coin_release_plan
 
 	extern const CoinAmount COIN;
 	extern const CoinAmount WAN;
+	extern const time_t YEAR;
 	extern const time_t MONTH;
 	extern const time_t DAY;
 	extern const time_t HOUR;

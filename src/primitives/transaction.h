@@ -450,6 +450,7 @@ public:
 	bool IsAdvertise()const;
 	bool IsSysMessage()const;
 	bool IsFilterAd()const;
+	bool HasComment()const;
 
 	//Set Type.
 	void SetEntrust();
@@ -466,6 +467,7 @@ public:
 	void	SetAgentId(uint256 id) { agentid = id; }
 
 	std::string GetAgentName() const;
+	bool IsEntrustWithCommentTx() const;
 #endif
 };
 

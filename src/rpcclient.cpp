@@ -104,6 +104,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
 #ifdef DPOS
 		{"entrust", 1},
 		{"entrust", 2},
+		{"entrustwithcomment", 1},
+		{"entrustwithcomment", 3},
 		{"deprive", 1},
 		{"getrawblock", 0},
 		{"getagent", 1},
